@@ -1,37 +1,53 @@
 export const TOKEN = {
-	ILLEGAL : "ILLEGAL",
-	EOF     : "EOF",
+  ILLEGAL: "ILLEGAL",
+  EOF: "EOF",
 
-	IDENT : "IDENT" ,
-	INT   : "INT"  ,
+  IDENT: "IDENT",
+  INT: "INT",
 
-	ASSIGN   :"=",
-	PLUS     : "+",
-	MINUS    : "-",
-	BANG     : "!",
-	ASTERISK : "*",
-	SLASH    : "/",
+  ASSIGN: "=",
+  PLUS: "+",
+  MINUS: "-",
+  BANG: "!",
+  ASTERISK: "*",
+  SLASH: "/",
 
-	LT : "<",
-	GT : ">",
+  LT: "<",
+  GT: ">",
 
-	EQ     : "==",
-	NOT_EQ : "!=",
+  EQ: "==",
+  NOT_EQ: "!=",
 
-	COMMA     : ",",
-	SEMICOLON : ";",
+  COMMA: ",",
+  SEMICOLON: ";",
 
-	LPAREN : "(",
-	RPAREN : ")",
-	LBRACE : "{",
-	RBRACE : "}",
+  LPAREN: "(",
+  RPAREN: ")",
+  LBRACE: "{",
+  RBRACE: "}",
 
-	FUNCTION : "FUNCTION",
-	LET      : "LET",
-	TRUE     : "TRUE",
-	FALSE    : "FALSE",
-	IF       : "IF",
-	ELSE     : "ELSE",
-	RETURN   : "RETURN",
+  FUNCTION: "FUNCTION",
+  LET: "LET",
+  TRUE: "TRUE",
+  FALSE: "FALSE",
+  IF: "IF",
+  ELSE: "ELSE",
+  RETURN: "RETURN",
+  CONST: "const",
+} as const;
 
-} as const
+export const keywords: Record<string, (typeof TOKEN)[keyof typeof TOKEN]> = {
+  fn: TOKEN.FUNCTION,
+  let: TOKEN.LET,
+  const: TOKEN.CONST,
+  true: TOKEN.TRUE,
+  false: TOKEN.FALSE,
+  if: TOKEN.IF,
+  else: TOKEN.ELSE,
+  return: TOKEN.RETURN,
+};
+
+export type TOKEN_STRUCT = {
+  type: string;
+  literal: typeof TOKEN;
+};

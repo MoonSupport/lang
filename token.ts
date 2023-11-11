@@ -36,7 +36,7 @@ export const TOKEN = {
   CONST: "const",
 } as const;
 
-export const keywords: Record<string, (typeof TOKEN)[keyof typeof TOKEN]> = {
+export const KEYWORDS: Record<string, (typeof TOKEN)[keyof typeof TOKEN]> = {
   fn: TOKEN.FUNCTION,
   let: TOKEN.LET,
   const: TOKEN.CONST,

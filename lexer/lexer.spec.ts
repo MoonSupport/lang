@@ -1,14 +1,14 @@
+// @ts-nocheck
 import { expect, test } from "bun:test";
-import { TOKEN } from "./token";
+import { TOKEN } from "../token";
 import {
   LexerMeta,
   classifyToken,
-  createLexer,
   nextToken,
   readChar,
   skipWhitespace,
   종료,
-} from "./lexer";
+} from ".";
 
 test("[readChar] 문자열을 읽는다.", () => {
   const meta: LexerMeta = {
@@ -94,6 +94,7 @@ test("Lexer가 토큰을 처리한다.", () => {
     다음_읽을_위치: 1,
     현재_문자: code[0],
   };
+
   for (const [expectedType, expectedLiteral] of expecteds) {
     const { token, meta: _meta } = nextToken(meta);
     meta = _meta;

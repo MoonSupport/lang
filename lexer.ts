@@ -11,11 +11,22 @@ export type LexerMeta = {
 export const 종료 = "😇";
 
 export const createLexer = (code: string) => {};
-export const nextToken = (): {
-  type: (typeof TOKEN)[keyof typeof TOKEN];
-  literal: string;
+export const nextToken = (
+  메타정보: LexerMeta
+): {
+  token: {
+    type: (typeof TOKEN)[keyof typeof TOKEN];
+    literal: string;
+  };
+  meta: LexerMeta;
 } => {
-  return { type: TOKEN.LET, literal: "let" };
+  const 공백제거_메타정보 = skipWhitespace(메타정보);
+
+  const { 메타정보: 새_메타정보, ...token } = classifyToken(공백제거_메타정보);
+  return {
+    token: token,
+    meta: 새_메타정보,
+  };
 };
 
 export const readChar = (메타정보: LexerMeta): LexerMeta => {
@@ -46,23 +57,32 @@ export const skipWhitespace = (메타정보: LexerMeta) => {
 };
 
 export const classifyToken = (메타정보: LexerMeta) => {
-  const token = match(메타정보.입력_값)
+  const token = match(메타정보.현재_문자)
     .with(종료, () => {
-      return { literla: "", type: TOKEN.EOF };
+      const _메타정보 = readChar(메타정보);
+      return { literal: "", type: TOKEN.EOF, 메타정보: _메타정보 };
     })
     .with(";", () => {
-      return { literal: ";", type: TOKEN.SEMICOLON };
+      const _메타정보 = readChar(메타정보);
+      return { literal: ";", type: TOKEN.SEMICOLON, 메타정보: _메타정보 };
+    })
+    .with("=", () => {
+      const _메타정보 = readChar(메타정보);
+      return { literal: "=", type: TOKEN.ASSIGN, 메타정보: _메타정보 };
     })
     .otherwise(() => {
       if (isLetter(메타정보.현재_문자)) {
-        const literal = readIdentifier(메타정보);
+        const { literal, 메타정보: _메타정보 } = readIdentifier(메타정보);
         const type = lookupIdent(literal);
-        return { literal, type };
+        return { literal, type, 메타정보: _메타정보 };
+      } else if (isDigit(메타정보.현재_문자)) {
+        const { literal, 메타정보: _메타정보 } = readNumber(메타정보);
+        return {
+          메타정보: _메타정보,
+          type: TOKEN.INT,
+          literal: literal,
+        };
       }
-      return {
-        type: TOKEN.IDENT,
-        literal: 메타정보.입력_값,
-      };
     });
 
   return token;
@@ -73,7 +93,21 @@ const readIdentifier = (메타정보: LexerMeta) => {
   while (isLetter(_메타정보.현재_문자)) {
     _메타정보 = readChar(_메타정보);
   }
-  return _메타정보.입력_값.substring(메타정보.현_위치, _메타정보.현_위치);
+  return {
+    메타정보: _메타정보,
+    literal: _메타정보.입력_값.substring(메타정보.현_위치, _메타정보.현_위치),
+  };
+};
+
+const readNumber = (메타정보: LexerMeta) => {
+  let _메타정보 = 메타정보;
+  while (isDigit(_메타정보.현재_문자)) {
+    _메타정보 = readChar(_메타정보);
+  }
+  return {
+    메타정보: _메타정보,
+    literal: _메타정보.입력_값.substring(메타정보.현_위치, _메타정보.현_위치),
+  };
 };
 
 const lookupIdent = (ident: string) => {
@@ -85,4 +119,8 @@ const lookupIdent = (ident: string) => {
 
 const isLetter = (ch: string): boolean => {
   return ("a" <= ch && ch <= "z") || ("A" <= ch && ch <= "Z") || ch == "_";
+};
+
+const isDigit = (ch: string): boolean => {
+  return "0" <= ch && ch <= "9";
 };

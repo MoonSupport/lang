@@ -1,4 +1,4 @@
-export const TOKEN = {
+export const TOKEN_TYPE = {
   ILLEGAL: "ILLEGAL",
   EOF: "EOF",
 
@@ -36,18 +36,22 @@ export const TOKEN = {
   CONST: "const",
 } as const;
 
-export const KEYWORDS: Record<string, (typeof TOKEN)[keyof typeof TOKEN]> = {
-  fn: TOKEN.FUNCTION,
-  let: TOKEN.LET,
-  const: TOKEN.CONST,
-  true: TOKEN.TRUE,
-  false: TOKEN.FALSE,
-  if: TOKEN.IF,
-  else: TOKEN.ELSE,
-  return: TOKEN.RETURN,
+export type TokenType = typeof TOKEN_TYPE;
+export type TokenTypeKey = keyof TokenType;
+export type TokenTypeValue = TokenType[TokenTypeKey];
+
+export const KEYWORDS: Record<string, TokenTypeValue> = {
+  fn: TOKEN_TYPE.FUNCTION,
+  let: TOKEN_TYPE.LET,
+  const: TOKEN_TYPE.CONST,
+  true: TOKEN_TYPE.TRUE,
+  false: TOKEN_TYPE.FALSE,
+  if: TOKEN_TYPE.IF,
+  else: TOKEN_TYPE.ELSE,
+  return: TOKEN_TYPE.RETURN,
 };
 
-export type TOKEN_STRUCT = {
-  type: string;
-  literal: typeof TOKEN;
+export type TOKEN = {
+  type: TokenTypeValue;
+  literal: string;
 };

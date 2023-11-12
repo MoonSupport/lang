@@ -2,7 +2,7 @@ import { match } from "ts-pattern";
 import { LexerMeta } from "./types";
 import { 종료 } from "./constant";
 import { readChar } from "./readChar";
-import { TOKEN } from "../token";
+import { TOKEN_TYPE, TOKEN } from "../token";
 import { isLetter } from "./isLetter";
 import { lookupIdent } from "./lookupIdent";
 import { isDigit } from "./isDigit";
@@ -10,45 +10,43 @@ import { readIdentifier } from "./readIdentifier";
 import { readNumber } from "./readNumber";
 import { peekChar } from "./peekChar";
 
-interface ClassifyToken {
-  literal: string;
-  type: (typeof TOKEN)[keyof typeof TOKEN];
+export interface TokenWithLexerMeta extends TOKEN {
   메타정보: LexerMeta;
 }
 
-export const classifyToken = (메타정보: LexerMeta): ClassifyToken => {
+export const classifyToken = (메타정보: LexerMeta): TokenWithLexerMeta => {
   const token = match(메타정보.현재_문자)
-    .returnType<ClassifyToken>()
-    .with(종료, (literal) => ({ literal, type: TOKEN.EOF, 메타정보: readChar(메타정보) }))
-    .with(";", (literal) => ({ literal, type: TOKEN.SEMICOLON, 메타정보: readChar(메타정보) }))
-    .with("(", (literal) => ({ literal, type: TOKEN.LPAREN, 메타정보: readChar(메타정보) }))
-    .with(")", (literal) => ({ literal, type: TOKEN.RPAREN, 메타정보: readChar(메타정보) }))
-    .with("{", (literal) => ({ literal, type: TOKEN.LBRACE, 메타정보: readChar(메타정보) }))
-    .with("}", (literal) => ({ literal, type: TOKEN.RBRACE, 메타정보: readChar(메타정보) }))
-    .with(",", (literal) => ({ literal, type: TOKEN.COMMA, 메타정보: readChar(메타정보) }))
-    .with("+", (literal) => ({ literal, type: TOKEN.PLUS, 메타정보: readChar(메타정보) }))
-    .with("-", (literal) => ({ literal, type: TOKEN.MINUS, 메타정보: readChar(메타정보) }))
-    .with("*", (literal) => ({ literal, type: TOKEN.ASTERISK, 메타정보: readChar(메타정보) }))
-    .with("/", (literal) => ({ literal, type: TOKEN.SLASH, 메타정보: readChar(메타정보) }))
-    .with("<", (literal) => ({ literal, type: TOKEN.LT, 메타정보: readChar(메타정보) }))
-    .with(">", (literal) => ({ literal, type: TOKEN.GT, 메타정보: readChar(메타정보) }))
+    .returnType<TokenWithLexerMeta>()
+    .with(종료, (literal) => ({ literal, type: TOKEN_TYPE.EOF, 메타정보: readChar(메타정보) }))
+    .with(";", (literal) => ({ literal, type: TOKEN_TYPE.SEMICOLON, 메타정보: readChar(메타정보) }))
+    .with("(", (literal) => ({ literal, type: TOKEN_TYPE.LPAREN, 메타정보: readChar(메타정보) }))
+    .with(")", (literal) => ({ literal, type: TOKEN_TYPE.RPAREN, 메타정보: readChar(메타정보) }))
+    .with("{", (literal) => ({ literal, type: TOKEN_TYPE.LBRACE, 메타정보: readChar(메타정보) }))
+    .with("}", (literal) => ({ literal, type: TOKEN_TYPE.RBRACE, 메타정보: readChar(메타정보) }))
+    .with(",", (literal) => ({ literal, type: TOKEN_TYPE.COMMA, 메타정보: readChar(메타정보) }))
+    .with("+", (literal) => ({ literal, type: TOKEN_TYPE.PLUS, 메타정보: readChar(메타정보) }))
+    .with("-", (literal) => ({ literal, type: TOKEN_TYPE.MINUS, 메타정보: readChar(메타정보) }))
+    .with("*", (literal) => ({ literal, type: TOKEN_TYPE.ASTERISK, 메타정보: readChar(메타정보) }))
+    .with("/", (literal) => ({ literal, type: TOKEN_TYPE.SLASH, 메타정보: readChar(메타정보) }))
+    .with("<", (literal) => ({ literal, type: TOKEN_TYPE.LT, 메타정보: readChar(메타정보) }))
+    .with(">", (literal) => ({ literal, type: TOKEN_TYPE.GT, 메타정보: readChar(메타정보) }))
     .with("!", (literal) => {
       if (peekChar(메타정보) == "=") {
         const ch = 메타정보.현재_문자;
         const _메타정보 = readChar(메타정보);
         const literal = ch + _메타정보.현재_문자;
-        return { literal, type: TOKEN.NOT_EQ, 메타정보: readChar(_메타정보) };
+        return { literal, type: TOKEN_TYPE.NOT_EQ, 메타정보: readChar(_메타정보) };
       }
-      return { literal, type: TOKEN.BANG, 메타정보: readChar(메타정보) };
+      return { literal, type: TOKEN_TYPE.BANG, 메타정보: readChar(메타정보) };
     })
     .with("=", (literal) => {
       if (peekChar(메타정보) == "=") {
         const ch = 메타정보.현재_문자;
         const _메타정보 = readChar(메타정보);
         const literal = ch + _메타정보.현재_문자;
-        return { literal, type: TOKEN.EQ, 메타정보: readChar(_메타정보) };
+        return { literal, type: TOKEN_TYPE.EQ, 메타정보: readChar(_메타정보) };
       }
-      return { literal, type: TOKEN.ASSIGN, 메타정보: readChar(메타정보) };
+      return { literal, type: TOKEN_TYPE.ASSIGN, 메타정보: readChar(메타정보) };
     })
 
     .otherwise(() => {
@@ -60,7 +58,7 @@ export const classifyToken = (메타정보: LexerMeta): ClassifyToken => {
         const { literal, 메타정보: _메타정보 } = readNumber(메타정보);
         return {
           메타정보: _메타정보,
-          type: TOKEN.INT,
+          type: TOKEN_TYPE.INT,
           literal: literal,
         };
       }

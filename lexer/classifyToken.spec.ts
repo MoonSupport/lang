@@ -1,6 +1,6 @@
 // @ts-ignore
 import { expect, test } from "bun:test";
-import { TOKEN } from "../token";
+import { TOKEN_TYPE } from "../token";
 import { classifyToken } from ".";
 
 test("[classifyToken] 토큰을 구분한다.", () => {
@@ -13,6 +13,6 @@ test("[classifyToken] 토큰을 구분한다.", () => {
 
   expect(token).toStrictEqual({
     literal: "const",
-    type: TOKEN.CONST,
+    type: TOKEN_TYPE.CONST,
   });
 });

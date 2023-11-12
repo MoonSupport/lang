@@ -30,13 +30,8 @@ export const classifyToken = (메타정보: LexerMeta): ClassifyToken => {
     .with("-", (literal) => ({ literal, type: TOKEN.MINUS, 메타정보: readChar(메타정보) }))
     .with("*", (literal) => ({ literal, type: TOKEN.ASTERISK, 메타정보: readChar(메타정보) }))
     .with("/", (literal) => ({ literal, type: TOKEN.SLASH, 메타정보: readChar(메타정보) }))
-
     .with("<", (literal) => ({ literal, type: TOKEN.LT, 메타정보: readChar(메타정보) }))
     .with(">", (literal) => ({ literal, type: TOKEN.GT, 메타정보: readChar(메타정보) }))
-
-    // .with("!", (literal) => ({ literal, type: TOKEN.SLASH, 메타정보: readChar(메타정보) }))
-    // .with("!", (literal) => ({ literal, type: TOKEN.SLASH, 메타정보: readChar(메타정보) }))
-    // .with("!", (literal) => ({ literal, type: TOKEN.SLASH, 메타정보: readChar(메타정보) }))
     .with("!", (literal) => {
       if (peekChar(메타정보) == "=") {
         const ch = 메타정보.현재_문자;

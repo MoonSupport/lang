@@ -9,3 +9,4 @@ export * from "./readIdentifier";
 export * from "./readNumber";
 export * from "./skipWhitespace";
 export * from "./types";
+export * from "./peekChar";

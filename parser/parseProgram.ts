@@ -1,12 +1,18 @@
 import { ParserMeta } from ".";
-import { TOKEN } from "../token";
+import { Statement } from "../ast";
+import { TOKEN_TYPE } from "../token";
+import { parseStatement } from "./parseStatement";
+
+interface MyProgram {
+  statements: Statement[];
+}
 
 export const parseProgram = (parser: ParserMeta): Program => {
-  const program = {
+  const program: MyProgram = {
     statements: [],
   };
-  while (parser.curToken !== TOKEN.EOF) {
-    const statement = parseStatement();
+  while (parser.curToken.type !== TOKEN_TYPE.EOF) {
+    const statement = parseStatement(parser.curToken);
     if (statement) {
       program.statements.push(statement);
     }

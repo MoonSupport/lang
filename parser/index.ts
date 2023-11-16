@@ -1,8 +1,8 @@
-import { TOKEN } from "../token";
+import { TOKEN, Token } from "../token";
 
 export interface ParserMeta {
-  curToken: (typeof TOKEN)[keyof typeof TOKEN];
-  peekToken: (typeof TOKEN)[keyof typeof TOKEN];
+  curToken: Token;
+  peekToken: Token;
 
   prefixParseFns: () => void;
 }

@@ -1,31 +1,33 @@
 import { match } from "ts-pattern";
-import { TOKEN } from "../token";
+import { Token, TOKEN_TYPE, TokenType, TokenTypeValue } from "../token";
+import { constructExpressionStatement, ExpressionStatement } from "../ast";
 
-export const parseStatement = (curToken: (typeof TOKEN)[keyof typeof TOKEN]) => {
+export const parseStatement = (curToken: Token) => {
   const result = match(curToken)
-    .with(TOKEN.LET, () => parseLetStatement())
-    .with(TOKEN.RETURN, () => parseReturnStatement())
-    .otherwise((_curToken) => parseExpressionStatement(_curToken));
+    .with({ type: TOKEN_TYPE.LET }, (token) => parseLetStatement(token))
+    .with({ type: TOKEN_TYPE.RETURN }, () => parseReturnStatement())
+    .otherwise((token) => parseExpressionStatement(token));
+
+  return result;
 };
 
-const parseLetStatement = () => {};
+const parseLetStatement = (curToken: Token) => {};
 const parseReturnStatement = () => {};
-const parseExpressionStatement = (curToken: (typeof TOKEN)[keyof typeof TOKEN]) => {
-  const statement = { Token: curToken };
+const parseExpressionStatement = (curToken: Token): ExpressionStatement => {
   const expression = parseExpression(curToken);
 
-  return { statement, expression };
+  return constructExpressionStatement({ token: curToken });
 };
 
-const parseExpression = (curToken: (typeof TOKEN)[keyof typeof TOKEN]) => {
-  const prefix = prefixParseFns[curToken];
+const parseExpression = (curToken: Token) => {
+  const prefix = prefixParseFns[curToken.type];
   return prefix();
 };
 
-const parseIdentifier = (curToken: (typeof TOKEN)[keyof typeof TOKEN]) => {
-  return { token: curToken, value: curToken.Literal };
+const parseIdentifier = (curToken: Token) => {
+  return { token: curToken, value: curToken.literal };
 };
 
 const prefixParseFns = {
-  [TOKEN.IDENT]: parseIdentifier,
-} as Record<(typeof TOKEN)[keyof typeof TOKEN], () => any>;
+  [TOKEN_TYPE.IDENT]: parseIdentifier,
+} as Record<TokenTypeValue, () => any>;

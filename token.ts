@@ -55,3 +55,8 @@ export type TOKEN = {
   type: TokenTypeValue;
   literal: string;
 };
+
+export type Token = {
+  type: TokenTypeValue;
+  literal: string;
+};

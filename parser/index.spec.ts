@@ -1,4 +1,5 @@
 import { expect, test } from "bun:test";
+import { parseProgram } from "./parseProgram";
 
 test("LetStatement를 파싱한다.", () => {
   const tests = [

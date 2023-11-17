@@ -5,7 +5,7 @@ import { LexerState } from "../lexer";
 import { nextToken } from "./nextToken";
 import { ParserState } from "./types";
 
-describe.only("[parseStatement]", () => {
+describe("[parseStatement]", () => {
   test("let문을 파싱한다.", () => {
     const token: Token = { type: TOKEN_TYPE.LET, literal: "let" };
 

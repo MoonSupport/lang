@@ -8,7 +8,7 @@ export const expectPeek = ({ parserState, lexerState }: State, expectedTokenType
     return nextToken({ parserState, lexerState });
   }
 
-  throw new Error(`Unexpected Expect Peek Token expected: ${expectedTokenTypeValue} but: ${state.peekToken.type}`);
+  throw new Error(`Unexpected Expect Peek Token expected: ${expectedTokenTypeValue} but: ${parserState.peekToken.type}`);
 };
 
 const peekTokenIs = (state: ParserState, expectedTokenTypeValue: TokenTypeValue): boolean => {

@@ -6,3 +6,5 @@ export interface ParserMeta {
 
   prefixParseFns: () => void;
 }
+
+export * from "./nextToken";

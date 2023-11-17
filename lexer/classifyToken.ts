@@ -1,5 +1,5 @@
 import { match } from "ts-pattern";
-import { LexerMeta } from "./types";
+import { LexerState } from "./types";
 import { 종료 } from "./constant";
 import { readChar } from "./readChar";
 import { TOKEN_TYPE, TOKEN } from "../token";
@@ -11,10 +11,10 @@ import { readNumber } from "./readNumber";
 import { peekChar } from "./peekChar";
 
 export interface TokenWithLexerMeta extends TOKEN {
-  메타정보: LexerMeta;
+  메타정보: LexerState;
 }
 
-export const classifyToken = (메타정보: LexerMeta): TokenWithLexerMeta => {
+export const classifyToken = (메타정보: LexerState): TokenWithLexerMeta => {
   const token = match(메타정보.현재_문자)
     .returnType<TokenWithLexerMeta>()
     .with(종료, (literal) => ({ literal, type: TOKEN_TYPE.EOF, 메타정보: readChar(메타정보) }))

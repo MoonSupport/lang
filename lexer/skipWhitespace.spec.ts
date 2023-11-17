@@ -1,9 +1,9 @@
 // @ts-ignore
 import { expect, test } from "bun:test";
-import { LexerMeta, skipWhitespace } from ".";
+import { LexerState, skipWhitespace } from ".";
 
 test("[skipWhitespace] 다음 문자열이 공백이라면 읽지 않는다.", () => {
-  const meta: LexerMeta = {
+  const meta: LexerState = {
     입력_값: "const    a = 1",
     현_위치: 5,
     다음_읽을_위치: 6,

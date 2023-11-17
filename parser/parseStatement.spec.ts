@@ -1,16 +1,16 @@
 import { describe, test } from "bun:test";
 import { parseStatement } from "./parseStatement";
 import { TOKEN_TYPE, Token } from "../token";
-import { LexerMeta } from "../lexer";
+import { LexerState } from "../lexer";
 import { nextToken } from "./nextToken";
 import { ParserState } from "./types";
 
-describe("[parseStatement]", () => {
-  test.only("let문을 파싱한다.", () => {
+describe.only("[parseStatement]", () => {
+  test("let문을 파싱한다.", () => {
     const token: Token = { type: TOKEN_TYPE.LET, literal: "let" };
 
     const code = `let five = 5;`;
-    const lexerMeta: LexerMeta = {
+    const lexerState: LexerState = {
       입력_값: code,
       현_위치: 0,
       다음_읽을_위치: 1,
@@ -25,7 +25,7 @@ describe("[parseStatement]", () => {
       peekToken: noopToken,
     };
 
-    const nextState = nextToken({ state: parserState, lexerMeta });
+    const nextState = nextToken({ parserState: parserState, lexerState });
     const _nextState = nextToken(nextState);
     const statement = parseStatement(_nextState);
     console.log(statement.toString());

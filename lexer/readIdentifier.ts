@@ -1,8 +1,8 @@
 import { readChar } from "./readChar";
 import { isLetter } from "./isLetter";
-import { LexerMeta } from "./types";
+import { LexerState } from "./types";
 
-export const readIdentifier = (메타정보: LexerMeta) => {
+export const readIdentifier = (메타정보: LexerState) => {
   let _메타정보 = 메타정보;
   while (isLetter(_메타정보.현재_문자)) {
     _메타정보 = readChar(_메타정보);

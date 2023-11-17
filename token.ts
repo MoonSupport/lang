@@ -1,4 +1,5 @@
 export const TOKEN_TYPE = {
+  _NOOP: "_NOOP",
   ILLEGAL: "ILLEGAL",
   EOF: "EOF",
 

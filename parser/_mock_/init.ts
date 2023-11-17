@@ -11,8 +11,8 @@ export const initializeState = (code: string): parser.State => {
   };
 
   const noopToken: TOKEN = {
-    type: TOKEN_TYPE.EOF,
-    literal: TOKEN_TYPE.EOF,
+    type: TOKEN_TYPE._NOOP,
+    literal: TOKEN_TYPE._NOOP,
   };
   const parserState: ParserState = {
     curToken: noopToken,

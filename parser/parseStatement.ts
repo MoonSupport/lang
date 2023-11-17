@@ -3,10 +3,16 @@ import { Token, TOKEN_TYPE, TokenType, TokenTypeValue } from "../token";
 import { createIdentifider, createIntegerExpression, createLetStatement, ExpressionNode, StatementNode } from "../ast";
 import { nextToken, State } from "./nextToken";
 import { LexerState } from "../lexer";
-import { expectPeek } from "./expectPeek";
+import { expectPeek, peekTokenIs } from "./expectPeek";
 import { ParserState } from "./types";
 
-export const parseStatement = ({ parserState, lexerState }: State): StatementNode | ExpressionNode => {
+export const parseStatement = ({
+  parserState,
+  lexerState,
+}: State): {
+  nextState: State;
+  statementNode: StatementNode;
+} => {
   const result = match(parserState.curToken)
     .with({ type: TOKEN_TYPE.LET }, () => parseLetStatement(parserState, lexerState))
     .otherwise((token) => parseExpressionStatement(token));
@@ -14,7 +20,13 @@ export const parseStatement = ({ parserState, lexerState }: State): StatementNod
   return result;
 };
 
-const parseLetStatement = (parserState: ParserState, lexerState: LexerState): StatementNode => {
+const parseLetStatement = (
+  parserState: ParserState,
+  lexerState: LexerState
+): {
+  nextState: State;
+  statementNode: StatementNode;
+} => {
   const nextState = expectPeek({ parserState, lexerState }, TOKEN_TYPE.IDENT);
   const _nextState = expectPeek({ parserState: nextState.parserState, lexerState: nextState.lexerState }, TOKEN_TYPE.ASSIGN);
   const identifier = createIdentifider({ token: nextState.parserState.curToken, value: nextState.parserState.curToken.literal });
@@ -23,10 +35,13 @@ const parseLetStatement = (parserState: ParserState, lexerState: LexerState): St
 
   const expression = parseExpression(__nextState.parserState.curToken);
 
-  return createLetStatement({ token: parserState.curToken, name: identifier, value: expression });
+  return {
+    statementNode: createLetStatement({ token: parserState.curToken, name: identifier, value: expression }),
+    nextState: peekTokenIs(__nextState.parserState, TOKEN_TYPE.SEMICOLON) ? nextToken(__nextState) : __nextState,
+  };
 };
 
-const parseExpressionStatement = (curToken: Token): ExpressionNode => {
+const parseExpressionStatement = (curToken: Token): any => {
   const expression = parseExpression(curToken);
 
   return expression;

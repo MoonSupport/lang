@@ -51,4 +51,4 @@ const parseIntegerLiteral = (curToken: Token): ExpressionNode => {
 const prefixParseFns = {
   [TOKEN_TYPE.IDENT]: parseIdentifier,
   [TOKEN_TYPE.INT]: parseIntegerLiteral,
-} as Record<TokenTypeValue, () => any>;
+} as Record<TokenTypeValue, (curToken: Token) => any>;

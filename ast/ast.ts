@@ -48,8 +48,13 @@ interface IntegerExpression {
 }
 export interface ExpressionNode extends Node {}
 
-export const createIntegerExpression = ({ token, value }: IntegerExpression): ExpressionNode => ({
+export interface IntegerLiteral extends ExpressionNode {
+  value: number;
+}
+
+export const createIntegerExpression = ({ token, value }: IntegerExpression): IntegerLiteral => ({
   _type: "IntegerLiteral",
+  value,
   tokenLiteral: () => token.literal,
   toString: () => token.literal,
 });

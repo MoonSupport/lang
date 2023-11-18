@@ -14,8 +14,8 @@ describe("[nextToken]", () => {
 
     expect(nextState.parserState).toStrictEqual({
       curToken: {
-        literal: "EOF",
-        type: TOKEN_TYPE.EOF,
+        literal: TOKEN_TYPE._NOOP,
+        type: TOKEN_TYPE._NOOP,
       },
       peekToken: {
         literal: "let",

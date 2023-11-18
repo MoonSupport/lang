@@ -1,9 +1,6 @@
 import { describe, test } from "bun:test";
 import { parseStatement } from "./parseStatement";
-import { TOKEN_TYPE, Token } from "../token";
-import { LexerState } from "../lexer";
 import { nextToken } from "./nextToken";
-import { ParserState } from "./types";
 import { initializeState } from "./_mock_/init";
 
 describe("[parseStatement]", () => {

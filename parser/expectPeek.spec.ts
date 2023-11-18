@@ -9,21 +9,21 @@ describe("[expectPeek]", () => {
     const state = initializeState(code);
     expect(state.parserState).toStrictEqual({
       curToken: {
-        type: TOKEN_TYPE.EOF,
-        literal: "EOF",
+        type: TOKEN_TYPE._NOOP,
+        literal: TOKEN_TYPE._NOOP,
       },
       peekToken: {
-        type: TOKEN_TYPE.EOF,
-        literal: "EOF",
+        type: TOKEN_TYPE._NOOP,
+        literal: TOKEN_TYPE._NOOP,
       },
     });
 
-    const token = expectPeek(state, TOKEN_TYPE.EOF);
+    const token = expectPeek(state, TOKEN_TYPE._NOOP);
 
     expect(token.parserState).toStrictEqual({
       curToken: {
-        type: TOKEN_TYPE.EOF,
-        literal: "EOF",
+        type: TOKEN_TYPE._NOOP,
+        literal: TOKEN_TYPE._NOOP,
       },
       peekToken: {
         type: TOKEN_TYPE.LET,

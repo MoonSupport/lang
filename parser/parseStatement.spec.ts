@@ -1,4 +1,4 @@
-import { describe, test } from "bun:test";
+import { describe, test, expect } from "bun:test";
 import { parseStatement } from "./parseStatement";
 import { nextToken } from "./nextToken";
 import { initializeState } from "./_mock_/init";
@@ -10,7 +10,7 @@ describe("[parseStatement]", () => {
 
     const nextState = nextToken({ parserState: parserState, lexerState });
     const _nextState = nextToken(nextState);
-    const statement = parseStatement(_nextState);
-    console.log(statement.toString());
+    const { statementNode } = parseStatement(_nextState);
+    expect(statementNode.toString()).toBe("let five = 5");
   });
 });

@@ -16,7 +16,6 @@ export const parseProgram = (state: State) => {
 
   let { parserState, lexerState } = nextToken(nextToken(state));
   while (parserState.curToken.type !== TOKEN_TYPE.EOF) {
-    console.log(parserState, lexerState);
     const { nextState, statementNode } = parseStatement({ parserState, lexerState });
     if (statementNode) {
       program.statements.push(statementNode);

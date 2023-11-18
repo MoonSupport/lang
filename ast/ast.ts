@@ -7,7 +7,10 @@ import { Token } from "../token";
 // 식별자란 상태도 표현식도 아닌 것인가
 // 값을 담아두는 ( 표현식을 담아둔다고도 볼 수 있나? ) 메모리를 참조하는 이름
 
-interface Node {
+type NodeType = "LetStatement" | "IntegerLiteral" | "Identifier";
+
+export interface Node {
+  _type: NodeType;
   tokenLiteral: () => string;
   toString: () => string;
 }
@@ -28,11 +31,13 @@ interface Identifier {
 interface IdentifierNode extends Node {}
 
 export const createIdentifider = ({ token, value }: Identifier): Node => ({
+  _type: "Identifier",
   tokenLiteral: () => token.literal,
   toString: () => value,
 });
 
 export const createLetStatement = ({ token, name, value }: LetStatement): StatementNode => ({
+  _type: "LetStatement",
   tokenLiteral: () => token.literal,
   toString: () => `${token.literal} ${name.toString()} = ${value.toString()}`,
 });
@@ -44,6 +49,7 @@ interface IntegerExpression {
 export interface ExpressionNode extends Node {}
 
 export const createIntegerExpression = ({ token, value }: IntegerExpression): ExpressionNode => ({
+  _type: "IntegerLiteral",
   tokenLiteral: () => token.literal,
   toString: () => token.literal,
 });

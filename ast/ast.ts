@@ -129,5 +129,5 @@ export const createInfixExpression = ({ token, value, left, right }: InfixExpres
   value,
   right,
   tokenLiteral: () => token.literal,
-  toString: () => `(${left.toString()}${value}${right.toString()})`,
+  toString: () => `(${left.toString()} ${value} ${right.toString()})`,
 });

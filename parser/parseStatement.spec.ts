@@ -2,6 +2,7 @@ import { describe, test, expect } from "bun:test";
 import { parseStatement } from "./parseStatement";
 import { nextToken } from "./nextToken";
 import { initializeState } from "./_mock_/init";
+import { TOKEN_TYPE } from "../token";
 
 describe("[parseStatement]", () => {
   test("숫자 리터럴을 가지는 let문을 파싱한다.", () => {
@@ -103,7 +104,30 @@ describe("[parseStatement]", () => {
     expect(statement.name.value).toBe("ten");
     expect(statement.value._type).toBe("InfixExpression");
     expect(statement.value.value).toBe("+");
-    expect(statement.toString()).toBe("let ten = (3+7)");
+    expect(statement.toString()).toBe("let ten = (3 + 7)");
+  });
+
+  test("우선순위에 따라 연산자를 파싱한다.", () => {
+    const codes = [
+      ["-a * b", "((-a) * b)"],
+      ["!-a", "(!(-a))"],
+      [`a + b + c`, "((a + b) + c)"],
+      ["a + b - c", "((a + b) - c)"],
+      ["a * b * c", "((a * b) * c)"],
+      ["a * b / c", "((a * b) / c)"],
+      ["a + b / c", "(a + (b / c))"],
+      ["a + b * c + d / e - f", "(((a + (b * c)) + (d / e)) - f)"],
+    ];
+
+    for (const [code, expected] of codes) {
+      const { parserState, lexerState } = initializeState(code);
+
+      const nextState = nextToken({ parserState: parserState, lexerState });
+      const _nextState = nextToken(nextState);
+      const { statement, nextState: __nextState } = parseStatement(_nextState);
+      const { statement: _statement, nextState: ___nextState } = parseStatement(__nextState);
+      expect(statement.toString()).toBe(expected);
+    }
   });
 
   test("expression을 파싱한다.", () => {

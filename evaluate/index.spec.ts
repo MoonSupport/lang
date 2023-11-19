@@ -30,7 +30,7 @@ describe("eval", () => {
     expect(expected).toBe(result.value);
   });
 
-  test("bang 표현식을 평가한다.", () => {
+  test("전위 표현자를 통해 부정 표현식을 평가한다.", () => {
     const [code, expected] = [`let a = !true; a;`, false];
 
     const state = initializeState(code);

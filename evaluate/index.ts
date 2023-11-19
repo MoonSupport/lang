@@ -19,6 +19,7 @@ export const evaluate = (node: Node, context: Context) => {
       const right = evaluate(node.right, context) as LangObject;
       return createPrefixObject(node, right);
     })
+    .with({ _type: "InfixExpression" }, () => {})
     .exhaustive();
 
   return result;

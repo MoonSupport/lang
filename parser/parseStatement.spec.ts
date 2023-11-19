@@ -100,7 +100,7 @@ describe("[parseStatement]", () => {
 
     expect(statement._type).toBe("LetStatement");
     expect(statement.name._type).toBe("Identifier");
-    expect(statement.name.value).toBe("minusFive");
+    expect(statement.name.value).toBe("ten");
     expect(statement.value._type).toBe("InfixExpression");
     expect(statement.value.value).toBe("+");
     expect(statement.toString()).toBe("let ten = (3+7)");

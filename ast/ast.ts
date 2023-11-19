@@ -48,7 +48,7 @@ interface IntegerLiteralRequirement {
   value: number;
 }
 
-export type Expression = IntegerLiteral | Bool | PrefixExpression | Identifier;
+export type Expression = IntegerLiteral | Bool | PrefixExpression | Identifier | InfixExpression;
 
 export interface IntegerLiteral {
   _type: "IntegerLiteral";
@@ -83,12 +83,6 @@ export const createBoolExpression = ({ token, value }: BoolRequirement): Bool =>
   toString: () => token.literal,
 });
 
-// type PrefixExpression struct {
-// 	Token    token.Token // The prefix token, e.g. !
-// 	Operator string
-// 	Right    Expression
-// }
-
 interface PrefixExpressionRequirement {
   token: Token;
   operator: "-" | "!";
@@ -109,4 +103,31 @@ export const createPrefixExpression = ({ token, operator, right }: PrefixExpress
   value: operator,
   tokenLiteral: () => token.literal,
   toString: () => `(${operator}${right.toString()})`,
+});
+
+export type Operator = "+" | "-" | "*" | "/";
+
+interface InfixExpressionRequirement {
+  token: Token;
+  left: Expression;
+  value: Operator;
+  right: Expression;
+}
+
+export interface InfixExpression {
+  _type: "InfixExpression";
+  left: Expression;
+  value: Operator;
+  right: Expression;
+  tokenLiteral: () => string;
+  toString: () => string;
+}
+
+export const createInfixExpression = ({ token, value, left, right }: InfixExpressionRequirement): InfixExpression => ({
+  _type: "InfixExpression",
+  left,
+  value,
+  right,
+  tokenLiteral: () => token.literal,
+  toString: () => `(${left.toString()}${value}${right.toString()})`,
 });

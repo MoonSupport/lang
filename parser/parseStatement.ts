@@ -1,6 +1,18 @@
 import { match } from "ts-pattern";
 import { Token, TOKEN_TYPE, TokenType, TokenTypeValue } from "../token";
-import { createBoolExpression, createIdentifider, createIntegerExpression, createLetStatement, Expression, Identifier, Node } from "../ast";
+import {
+  Bool,
+  createBoolExpression,
+  createIdentifider,
+  createIntegerExpression,
+  createLetStatement,
+  createPrefixExpression,
+  Expression,
+  Identifier,
+  IntegerLiteral,
+  Node,
+  PrefixExpression,
+} from "../ast";
 import { nextToken, State } from "./nextToken";
 import { LexerState } from "../lexer";
 import { expectPeek, peekTokenIs } from "./expectPeek";
@@ -34,11 +46,10 @@ const parseLetStatement = (
 
   const __nextState = nextToken(_nextState);
 
-  const expression = parseExpression(__nextState.parserState.curToken);
-
+  const { expression, state: ___nextState } = parseExpression(__nextState.parserState.curToken, __nextState);
   return {
     statement: createLetStatement({ token: parserState.curToken, name: identifier, value: expression }),
-    nextState: peekTokenIs(__nextState.parserState, TOKEN_TYPE.SEMICOLON) ? nextToken(__nextState) : __nextState,
+    nextState: peekTokenIs(___nextState.parserState, TOKEN_TYPE.SEMICOLON) ? nextToken(___nextState) : ___nextState,
   };
 };
 
@@ -47,31 +58,52 @@ const parseExpressionStatement = (
   curToken: Token
 ): {
   nextState: State;
-  statement: Node;
+  statement: Expression;
 } => {
-  const expression = parseExpression(curToken);
+  const { expression, state: nextState } = parseExpression(curToken, state);
+  // if p.peekTokenIs(token.SEMICOLON) {
+  // 	p.nextToken()
+  // }
 
-  return { nextState: state, statement: expression };
+  return { nextState: peekTokenIs(nextState.parserState, TOKEN_TYPE.SEMICOLON) ? nextToken(nextState) : nextState, statement: expression };
 };
 
-const parseExpression = (curToken: Token): Expression => {
+const parseExpression = (curToken: Token, state: State): { expression: Expression; state: State } => {
   const prefix = prefixParseFns[curToken.type];
   if (!prefix) {
     return null as any;
   }
-  return prefix(curToken);
+  return prefix(curToken, state);
 };
 
-const parseIdentifier = (curToken: Token): Identifier => {
-  return createIdentifider({ token: curToken, value: curToken.literal });
+const parseIdentifier = (curToken: Token, state: State): { expression: Identifier; state: State } => {
+  return {
+    expression: createIdentifider({ token: curToken, value: curToken.literal }),
+    state,
+  };
 };
 
-const parseIntegerLiteral = (curToken: Token): Expression => {
-  return createIntegerExpression({ token: curToken, value: parseInt(curToken.literal, 10) });
+const parseIntegerLiteral = (curToken: Token, state: State): { expression: IntegerLiteral; state: State } => {
+  return {
+    expression: createIntegerExpression({ token: curToken, value: parseInt(curToken.literal, 10) }),
+    state,
+  };
 };
 
-const parseBoolean = (curToken: Token): Expression => {
-  return createBoolExpression({ token: curToken, value: curTokenIs(curToken, TOKEN_TYPE.TRUE) });
+const parseBoolean = (curToken: Token, state: State): { expression: Bool; state: State } => {
+  return {
+    expression: createBoolExpression({ token: curToken, value: curTokenIs(curToken, TOKEN_TYPE.TRUE) }),
+    state,
+  };
+};
+
+const parsePrefixExpression = (curToken: Token, state: State): { expression: PrefixExpression; state: State } => {
+  const _nextState = nextToken(state);
+  const right = parseExpression(_nextState.parserState.curToken, _nextState);
+  return {
+    expression: createPrefixExpression({ token: curToken, operator: curToken.literal, right: right.expression }),
+    state: _nextState,
+  };
 };
 
 const prefixParseFns = {
@@ -79,4 +111,5 @@ const prefixParseFns = {
   [TOKEN_TYPE.INT]: parseIntegerLiteral,
   [TOKEN_TYPE.TRUE]: parseBoolean,
   [TOKEN_TYPE.FALSE]: parseBoolean,
-} as Record<TokenTypeValue, (curToken: Token) => any>;
+  [TOKEN_TYPE.BANG]: parsePrefixExpression,
+} as Record<TokenTypeValue, (curToken: Token, state: State) => { expression: Expression; state: State }>;

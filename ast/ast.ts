@@ -1,6 +1,6 @@
 import { Token } from "../token";
 
-export type Node = LetStatement | Identifier | IntegerLiteral | Bool;
+export type Node = LetStatement | Expression;
 
 export interface LetStatement {
   _type: "LetStatement";
@@ -48,7 +48,7 @@ interface IntegerLiteralRequirement {
   value: number;
 }
 
-export type Expression = IntegerLiteral | Bool;
+export type Expression = IntegerLiteral | Bool | PrefixExpression | Identifier;
 
 export interface IntegerLiteral {
   _type: "IntegerLiteral";
@@ -81,4 +81,32 @@ export const createBoolExpression = ({ token, value }: BoolRequirement): Bool =>
   value,
   tokenLiteral: () => token.literal,
   toString: () => token.literal,
+});
+
+// type PrefixExpression struct {
+// 	Token    token.Token // The prefix token, e.g. !
+// 	Operator string
+// 	Right    Expression
+// }
+
+interface PrefixExpressionRequirement {
+  token: Token;
+  operator: string;
+  right: Expression;
+}
+
+export interface PrefixExpression {
+  _type: "PrefixExpression";
+  right: Expression;
+  value: string;
+  tokenLiteral: () => string;
+  toString: () => string;
+}
+
+export const createPrefixExpression = ({ token, operator, right }: PrefixExpressionRequirement): PrefixExpression => ({
+  _type: "PrefixExpression",
+  right,
+  value: operator,
+  tokenLiteral: () => token.literal,
+  toString: () => `(${operator}${right.toString()})`,
 });

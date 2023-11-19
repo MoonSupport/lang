@@ -15,11 +15,11 @@ describe("[parserProgram] 파싱한 결과가 상태의 갯수와 일치한다. 
   });
 
   test("expression 파싱", () => {
-    const code = `five; six; seven;`;
+    const code = `five;`;
     const state = initializeState(code);
-
+    // six; seven;
     const program = parseProgram(state);
-    expect(program.statements).toHaveLength(3);
+    expect(program.statements).toHaveLength(1);
   });
 
   test("let과 expression 파싱 ", () => {

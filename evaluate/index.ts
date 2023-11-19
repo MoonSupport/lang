@@ -32,9 +32,3 @@ const evaluateLetStatement = (node: LetStatement, context: Context): void => {
 const evaluatIdentifier = (node: Identifier, context: Context) => {
   return context.memories.get(node.value);
 };
-
-// val := Eval(node.Value, env)
-// if isError(val) {
-//   return val
-// }
-// env.Set(node.Name.Value, val)

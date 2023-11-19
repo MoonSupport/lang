@@ -89,6 +89,23 @@ describe("[parseStatement]", () => {
     expect(statement.toString()).toBe("let minusFive = (-5)");
   });
 
+  test("합 연산자를 파싱한다.", () => {
+    const code = `let ten = 3 + 7;`;
+    const { parserState, lexerState } = initializeState(code);
+
+    const nextState = nextToken({ parserState: parserState, lexerState });
+    const _nextState = nextToken(nextState);
+    const { statement } = parseStatement(_nextState);
+    if (statement._type !== "LetStatement") throw new Error("Unxpected Value");
+
+    expect(statement._type).toBe("LetStatement");
+    expect(statement.name._type).toBe("Identifier");
+    expect(statement.name.value).toBe("minusFive");
+    expect(statement.value._type).toBe("InfixExpression");
+    expect(statement.value.value).toBe("+");
+    expect(statement.toString()).toBe("let ten = (3+7)");
+  });
+
   test("expression을 파싱한다.", () => {
     const code = `five;`;
     const { parserState, lexerState } = initializeState(code);

@@ -101,7 +101,7 @@ const parsePrefixExpression = (curToken: Token, state: State): { expression: Pre
   const _nextState = nextToken(state);
   const right = parseExpression(_nextState.parserState.curToken, _nextState);
   return {
-    expression: createPrefixExpression({ token: curToken, operator: curToken.literal, right: right.expression }),
+    expression: createPrefixExpression({ token: curToken, operator: curToken.literal as "-" | "!", right: right.expression }),
     state: _nextState,
   };
 };

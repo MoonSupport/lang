@@ -1,6 +1,6 @@
 import { Token } from "../token";
 
-export type Node = LetStatement | Identifier | IntegerLiteral;
+export type Node = LetStatement | Identifier | IntegerLiteral | Bool;
 
 export interface LetStatement {
   _type: "LetStatement";
@@ -48,7 +48,7 @@ interface IntegerLiteralRequirement {
   value: number;
 }
 
-export type Expression = IntegerLiteral;
+export type Expression = IntegerLiteral | Bool;
 
 export interface IntegerLiteral {
   _type: "IntegerLiteral";
@@ -59,6 +59,25 @@ export interface IntegerLiteral {
 
 export const createIntegerExpression = ({ token, value }: IntegerLiteralRequirement): IntegerLiteral => ({
   _type: "IntegerLiteral",
+  value,
+  tokenLiteral: () => token.literal,
+  toString: () => token.literal,
+});
+
+interface BoolRequirement {
+  token: Token;
+  value: boolean;
+}
+
+export interface Bool {
+  _type: "Bool";
+  value: boolean;
+  tokenLiteral: () => string;
+  toString: () => string;
+}
+
+export const createBoolExpression = ({ token, value }: BoolRequirement): Bool => ({
+  _type: "Bool",
   value,
   tokenLiteral: () => token.literal,
   toString: () => token.literal,

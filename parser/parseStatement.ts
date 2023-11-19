@@ -1,10 +1,11 @@
 import { match } from "ts-pattern";
 import { Token, TOKEN_TYPE, TokenType, TokenTypeValue } from "../token";
-import { createIdentifider, createIntegerExpression, createLetStatement, Expression, Identifier, Node } from "../ast";
+import { createBoolExpression, createIdentifider, createIntegerExpression, createLetStatement, Expression, Identifier, Node } from "../ast";
 import { nextToken, State } from "./nextToken";
 import { LexerState } from "../lexer";
 import { expectPeek, peekTokenIs } from "./expectPeek";
 import { ParserState } from "./types";
+import { curTokenIs } from "./curTokenIs";
 
 export const parseStatement = ({
   parserState,
@@ -69,7 +70,13 @@ const parseIntegerLiteral = (curToken: Token): Expression => {
   return createIntegerExpression({ token: curToken, value: parseInt(curToken.literal, 10) });
 };
 
+const parseBoolean = (curToken: Token): Expression => {
+  return createBoolExpression({ token: curToken, value: curTokenIs(curToken, TOKEN_TYPE.TRUE) });
+};
+
 const prefixParseFns = {
   [TOKEN_TYPE.IDENT]: parseIdentifier,
   [TOKEN_TYPE.INT]: parseIntegerLiteral,
+  [TOKEN_TYPE.TRUE]: parseBoolean,
+  [TOKEN_TYPE.FALSE]: parseBoolean,
 } as Record<TokenTypeValue, (curToken: Token) => any>;

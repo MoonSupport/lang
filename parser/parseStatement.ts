@@ -71,7 +71,7 @@ const parseExpressionStatement = (
 const parseExpression = (curToken: Token, state: State): { expression: Expression; state: State } => {
   const prefix = prefixParseFns[curToken.type];
   if (!prefix) {
-    return null as any;
+    throw new Error(`Unxpected token type: ${curToken.type}`);
   }
   return prefix(curToken, state);
 };
@@ -112,4 +112,5 @@ const prefixParseFns = {
   [TOKEN_TYPE.TRUE]: parseBoolean,
   [TOKEN_TYPE.FALSE]: parseBoolean,
   [TOKEN_TYPE.BANG]: parsePrefixExpression,
+  [TOKEN_TYPE.MINUS]: parsePrefixExpression,
 } as Record<TokenTypeValue, (curToken: Token, state: State) => { expression: Expression; state: State }>;

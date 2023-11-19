@@ -1,7 +1,7 @@
 import { match } from "ts-pattern";
 import { LetStatement, Node, Identifier } from "../ast";
 import { Context } from "../context";
-import { createIntegerObject } from "../object";
+import { createIntegerObject, createBoolObject, createPrefixObject, LangObject } from "../object";
 
 export const evaluate = (node: Node, context: Context) => {
   const result = match(node)
@@ -11,6 +11,13 @@ export const evaluate = (node: Node, context: Context) => {
     })
     .with({ _type: "IntegerLiteral" }, (node) => {
       return createIntegerObject(node);
+    })
+    .with({ _type: "Bool" }, (node) => {
+      return createBoolObject(node);
+    })
+    .with({ _type: "PrefixExpression" }, (node) => {
+      const right = evaluate(node.right, context) as LangObject;
+      return createPrefixObject(node, right);
     })
     .exhaustive();
 
@@ -23,7 +30,6 @@ const evaluateLetStatement = (node: LetStatement, context: Context): void => {
 };
 
 const evaluatIdentifier = (node: Identifier, context: Context) => {
-  console.log("evaluatIdentifier::");
   return context.memories.get(node.value);
 };
 

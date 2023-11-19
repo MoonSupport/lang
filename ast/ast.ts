@@ -91,14 +91,14 @@ export const createBoolExpression = ({ token, value }: BoolRequirement): Bool =>
 
 interface PrefixExpressionRequirement {
   token: Token;
-  operator: string;
+  operator: "-" | "!";
   right: Expression;
 }
 
 export interface PrefixExpression {
   _type: "PrefixExpression";
   right: Expression;
-  value: string;
+  value: "-" | "!";
   tokenLiteral: () => string;
   toString: () => string;
 }

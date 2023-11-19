@@ -1,8 +1,6 @@
-// import { ParserMeta } from ".";
 import { Node } from "../ast";
 import { TOKEN_TYPE } from "../token";
 import { State, nextToken } from "./nextToken";
-// import { TOKEN_TYPE } from "../token";
 import { parseStatement } from "./parseStatement";
 
 interface MyProgram {
@@ -28,9 +26,3 @@ export const parseProgram = (state: State) => {
   }
   return program;
 };
-
-// export interface Program {
-//   statements: {
-//     tokenLiteral: string;
-//   };
-// }

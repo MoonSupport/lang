@@ -1,7 +1,22 @@
 import { match } from "ts-pattern";
-import { LetStatement, Node, Identifier } from "../ast";
+import { LetStatement, Node, Identifier, Operator, createIntegerExpression } from "../ast";
 import { Context } from "../context";
-import { createIntegerObject, createBoolObject, createPrefixObject, LangObject } from "../object";
+import { createIntegerObject, createBoolObject, createPrefixObject, LangObject, createIntegerObjectByValue, IntegerObject } from "../object";
+
+const evalIntegerInfixExpression = (operator: Operator, left: IntegerObject, right: IntegerObject) => {
+  return match(operator)
+    .with("+", () => createIntegerObjectByValue(left.value + right.value))
+    .otherwise(() => createIntegerObjectByValue(-1));
+};
+
+const evalInfixExpression = (operator: Operator, left: LangObject, right: LangObject) => {
+  switch (true) {
+    case left.type === "Integer" && right.type === "Integer":
+      return evalIntegerInfixExpression(operator, left as IntegerObject, right as IntegerObject);
+    default:
+      throw new Error("");
+  }
+};
 
 export const evaluate = (node: Node, context: Context) => {
   const result = match(node)
@@ -19,7 +34,12 @@ export const evaluate = (node: Node, context: Context) => {
       const right = evaluate(node.right, context) as LangObject;
       return createPrefixObject(node, right);
     })
-    .with({ _type: "InfixExpression" }, () => {})
+    .with({ _type: "InfixExpression" }, (node) => {
+      const left = evaluate(node.left, context);
+      const right = evaluate(node.right, context);
+
+      return evalInfixExpression(node.value, left, right);
+    })
     .exhaustive();
 
   return result;

@@ -39,6 +39,19 @@ describe("eval", () => {
 
     evaluate(ast.statements[0], rootContext);
     const result = evaluate(ast.statements[1], rootContext) as BoolObject;
-    expect(expected).toBe(false);
+
+    expect(expected).toBe(result.value);
+  });
+
+  test("후위 표현자를 통해 더할 수 있다.", () => {
+    const [code, expected] = [`let ten = 3 + 7; ten;`, 10];
+
+    const state = initializeState(code);
+    const ast = parseProgram(state);
+    const rootContext = createContext();
+
+    evaluate(ast.statements[0], rootContext);
+    const result = evaluate(ast.statements[1], rootContext);
+    expect(expected).toBe(result.value);
   });
 });

@@ -17,6 +17,12 @@ export const createIntegerObject = (node: IntegerLiteral): IntegerObject => ({
   inspect: () => String(node.value),
 });
 
+export const createIntegerObjectByValue = (value: number): IntegerObject => ({
+  type: "Integer",
+  value: value,
+  inspect: () => String(value),
+});
+
 export interface BoolObject {
   type: ObjectType;
   inspect: () => string;
@@ -47,5 +53,5 @@ export const createPrefixObject = (node: PrefixExpression, right: LangObject) =>
     .with({ value: "-" }, () => {})
     .exhaustive();
 
-  return;
+  return result;
 };

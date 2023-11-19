@@ -1,19 +1,13 @@
 import { Token } from "../token";
 
-type NodeType = "LetStatement" | "IntegerLiteral" | "Identifier";
+export type Node = LetStatement | Identifier | IntegerLiteral;
 
-export interface Node {
-  _type: NodeType;
-  tokenLiteral: () => string;
-  toString: () => string;
-}
-
-export interface StatementNode extends Node {}
-
-interface LetStatementRequirement {
-  token: Token;
+export interface LetStatement {
+  _type: "LetStatement";
   name: Identifier;
   value: Expression;
+  tokenLiteral: () => string;
+  toString: () => string;
 }
 
 interface IdentifierRequirement {
@@ -21,16 +15,30 @@ interface IdentifierRequirement {
   value: string;
 }
 
-interface Identifier extends Node {}
+export interface Identifier {
+  _type: "Identifier";
+  value: string;
+  tokenLiteral: () => string;
+  toString: () => string;
+}
 
-export const createIdentifider = ({ token, value }: IdentifierRequirement): Node => ({
+export const createIdentifider = ({ token, value }: IdentifierRequirement): Identifier => ({
   _type: "Identifier",
+  value,
   tokenLiteral: () => token.literal,
   toString: () => value,
 });
 
-export const createLetStatement = ({ token, name, value }: LetStatementRequirement): StatementNode => ({
+interface LetStatementRequirement {
+  token: Token;
+  name: Identifier;
+  value: Expression;
+}
+
+export const createLetStatement = ({ token, name, value }: LetStatementRequirement): LetStatement => ({
   _type: "LetStatement",
+  name,
+  value,
   tokenLiteral: () => token.literal,
   toString: () => `${token.literal} ${name.toString()} = ${value.toString()}`,
 });
@@ -40,10 +48,13 @@ interface IntegerLiteralRequirement {
   value: number;
 }
 
-export interface Expression extends Node {}
+export type Expression = IntegerLiteral;
 
-export interface IntegerLiteral extends Node {
+export interface IntegerLiteral {
+  _type: "IntegerLiteral";
   value: number;
+  tokenLiteral: () => string;
+  toString: () => string;
 }
 
 export const createIntegerExpression = ({ token, value }: IntegerLiteralRequirement): IntegerLiteral => ({

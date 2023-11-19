@@ -15,7 +15,7 @@ export const parseStatement = ({
 } => {
   const result = match(parserState.curToken)
     .with({ type: TOKEN_TYPE.LET }, () => parseLetStatement(parserState, lexerState))
-    .otherwise((token) => parseExpressionStatement(token));
+    .otherwise((token) => parseExpressionStatement({ parserState, lexerState }, token));
 
   return result;
 };
@@ -41,10 +41,16 @@ const parseLetStatement = (
   };
 };
 
-const parseExpressionStatement = (curToken: Token): any => {
+const parseExpressionStatement = (
+  state: State,
+  curToken: Token
+): {
+  nextState: State;
+  statementNode: StatementNode;
+} => {
   const expression = parseExpression(curToken);
 
-  return expression;
+  return { nextState: state, statementNode: expression };
 };
 
 const parseExpression = (curToken: Token): ExpressionNode => {

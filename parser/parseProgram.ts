@@ -1,12 +1,12 @@
 // import { ParserMeta } from ".";
-import { Statement } from "../ast";
+import { Node } from "../ast";
 import { TOKEN_TYPE } from "../token";
 import { State, nextToken } from "./nextToken";
 // import { TOKEN_TYPE } from "../token";
 import { parseStatement } from "./parseStatement";
 
 interface MyProgram {
-  statements: Statement[];
+  statements: Node[];
 }
 
 export const parseProgram = (state: State) => {
@@ -16,9 +16,9 @@ export const parseProgram = (state: State) => {
 
   let { parserState, lexerState } = nextToken(nextToken(state));
   while (parserState.curToken.type !== TOKEN_TYPE.EOF) {
-    const { nextState, statementNode } = parseStatement({ parserState, lexerState });
-    if (statementNode) {
-      program.statements.push(statementNode);
+    const { nextState, statement } = parseStatement({ parserState, lexerState });
+    if (statement) {
+      program.statements.push(statement);
     }
 
     // TODO: 원인 파악 필요

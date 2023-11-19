@@ -5,7 +5,7 @@ import { initializeState } from "../parser/_mock_/init";
 import { createContext } from "../context";
 import { IntegerObject } from "../object";
 
-describe.only("eval", () => {
+describe("eval", () => {
   test("표현식을 평가한다.", () => {
     const [code, expected] = [`let a = 5; a;`, 5];
 

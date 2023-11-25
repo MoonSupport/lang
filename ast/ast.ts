@@ -105,7 +105,7 @@ export const createPrefixExpression = ({ token, operator, right }: PrefixExpress
   toString: () => `(${operator}${right.toString()})`,
 });
 
-export type Operator = "+" | "-" | "*" | "/";
+export type Operator = "+" | "-" | "*" | "/" | ">" | "<" | "==" | "!=";
 
 interface InfixExpressionRequirement {
   token: Token;

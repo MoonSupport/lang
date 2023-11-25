@@ -54,4 +54,25 @@ describe("eval", () => {
     const result = evaluate(ast.statements[1], rootContext);
     expect(expected).toBe(result.value);
   });
+
+  test("우선 순위 연산자를 통해 더할 수 있다.", () => {
+    const cases: [string, number | boolean][] = [
+      [`let a = 1 + 2 * 3; a;`, 7],
+      [`let a = (1 + 2) * 3; a;`, 9],
+      [`let a = 2 > 1 * 3; a;`, false],
+      [`let a = 2 < 1 * 3; a;`, true],
+      [`let a = 2 == 1 * 3; a;`, false],
+      [`let a = 2 != 1 * 3; a;`, true],
+    ];
+
+    for (const [code, expected] of cases) {
+      const state = initializeState(code);
+      const ast = parseProgram(state);
+      const rootContext = createContext();
+
+      evaluate(ast.statements[0], rootContext);
+      const result = evaluate(ast.statements[1], rootContext);
+      expect(expected).toBe(result.value);
+    }
+  });
 });

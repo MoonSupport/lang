@@ -1,11 +1,27 @@
 import { match } from "ts-pattern";
 import { LetStatement, Node, Identifier, Operator, createIntegerExpression } from "../ast";
 import { Context } from "../context";
-import { createIntegerObject, createBoolObject, createPrefixObject, LangObject, createIntegerObjectByValue, IntegerObject } from "../object";
+import {
+  createIntegerObject,
+  createBoolObject,
+  createPrefixObject,
+  LangObject,
+  createIntegerObjectByValue,
+  IntegerObject,
+  createBoolObjectByValue,
+} from "../object";
 
 const evalIntegerInfixExpression = (operator: Operator, left: IntegerObject, right: IntegerObject) => {
   return match(operator)
     .with("+", () => createIntegerObjectByValue(left.value + right.value))
+    .with("-", () => createIntegerObjectByValue(left.value - right.value))
+    .with("*", () => createIntegerObjectByValue(left.value * right.value))
+    .with("/", () => createIntegerObjectByValue(left.value / right.value))
+    .with("<", () => createBoolObjectByValue(left.value < right.value))
+    .with(">", () => createBoolObjectByValue(left.value > right.value))
+    .with("==", () => createBoolObjectByValue(left.value == right.value))
+    .with("!=", () => createBoolObjectByValue(left.value != right.value))
+
     .otherwise(() => createIntegerObjectByValue(-1));
 };
 

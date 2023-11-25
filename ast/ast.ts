@@ -1,6 +1,7 @@
 import { Token } from "../token";
 
-export type Node = LetStatement | Expression;
+export type Node = LetStatement | IfStatement | Expression;
+export type Statement = Node;
 
 export interface LetStatement {
   _type: "LetStatement";
@@ -131,3 +132,17 @@ export const createInfixExpression = ({ token, value, left, right }: InfixExpres
   tokenLiteral: () => token.literal,
   toString: () => `(${left.toString()} ${value} ${right.toString()})`,
 });
+
+export interface IfStatement {
+  _type: "IfStatement";
+  condition: Expression;
+  value: "if";
+  consequence: BlockStatement;
+  alternative: BlockStatement;
+}
+
+export interface BlockStatement {
+  _type: "BlockStatement";
+  token: Token;
+  statements: Statement[];
+}

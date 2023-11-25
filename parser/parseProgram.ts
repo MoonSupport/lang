@@ -18,9 +18,9 @@ export const parseProgram = (state: State) => {
     if (statement) {
       program.statements.push(statement);
     }
-
     // TODO: 원인 파악 필요
     const _nextToken = nextState ? nextToken(nextState) : nextState;
+
     parserState = _nextToken.parserState;
     lexerState = _nextToken.lexerState;
   }

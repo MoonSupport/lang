@@ -45,7 +45,7 @@ export const parseStatement = ({
 } => {
   const result = match(parserState.curToken)
     .with({ type: TOKEN_TYPE.LET }, () => parseLetStatement(parserState, lexerState))
-    .otherwise((token) => parseExpressionStatement({ parserState, lexerState }, token));
+    .otherwise(() => parseExpressionStatement({ parserState, lexerState }));
 
   return result;
 };
@@ -71,13 +71,13 @@ const parseLetStatement = (
 };
 
 const parseExpressionStatement = (
-  state: State,
-  curToken: Token
+  state: State
 ): {
   nextState: State;
   statement: Expression;
 } => {
   const { expression, state: nextState } = parseExpression(state, LOWEST);
+
   return { nextState: peekTokenIs(nextState.parserState, TOKEN_TYPE.SEMICOLON) ? nextToken(nextState) : nextState, statement: expression };
 };
 
@@ -100,7 +100,6 @@ const parseExpression = (state: State, precedence: (typeof PrecedenceLevel)[numb
   while (precedence < peekPrecedence(leftExpressionWithState.state)) {
     const infix = infixParseFns[leftExpressionWithState.state.parserState.peekToken.type];
     if (!infix) return leftExpressionWithState;
-
     const nextState = nextToken(leftExpressionWithState.state);
 
     leftExpressionWithState = infix(nextState, leftExpressionWithState.expression);
@@ -130,8 +129,22 @@ const parseBoolean = (state: State): { expression: Bool; state: State } => {
   };
 };
 
+const parseGroupedExpression = (
+  state: State
+): {
+  expression: Expression;
+  state: State;
+} => {
+  const nextState = nextToken(state);
+  const { expression, state: _nextState } = parseExpression(nextState, LOWEST);
+
+  const __nextState = expectPeek(_nextState, TOKEN_TYPE.RPAREN);
+  return { expression, state: __nextState };
+};
+
 const parsePrefixExpression = (state: State): { expression: PrefixExpression; state: State } => {
   const _nextState = nextToken(state);
+
   const right = parseExpression(_nextState, PREFIX);
   return {
     expression: createPrefixExpression({
@@ -150,6 +163,8 @@ const prefixParseFns = {
   [TOKEN_TYPE.FALSE]: parseBoolean,
   [TOKEN_TYPE.BANG]: parsePrefixExpression,
   [TOKEN_TYPE.MINUS]: parsePrefixExpression,
+  [TOKEN_TYPE.LPAREN]: parseGroupedExpression,
+  // p.registerPrefix(token.LPAREN, p.parseGroupedExpression)
 } as Record<TokenTypeValue, (state: State) => { expression: Expression; state: State }>;
 
 const curPrecedence = ({ parserState }: State) => {
@@ -167,7 +182,10 @@ const parseInfixExpression = (
   state: State;
 } => {
   const precedence = curPrecedence(state);
+
+  // 3 + 4
   const nextState = nextToken(state);
+
   const right = parseExpression(nextState, precedence);
 
   return {

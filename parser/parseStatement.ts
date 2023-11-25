@@ -115,7 +115,7 @@ const parseIdentifier = (state: State): { expression: Identifier; state: State }
     state,
   };
 };
-
+``;
 const parseIntegerLiteral = (state: State): { expression: IntegerLiteral; state: State } => {
   return {
     expression: createIntegerExpression({ token: state.parserState.curToken, value: parseInt(state.parserState.curToken.literal, 10) }),

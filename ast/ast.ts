@@ -1,6 +1,6 @@
 import { Token } from "../token";
 
-export type Node = LetStatement | IfStatement | Expression;
+export type Node = LetStatement | BlockStatement | Expression;
 export type Statement = Node;
 
 export interface LetStatement {
@@ -49,7 +49,7 @@ interface IntegerLiteralRequirement {
   value: number;
 }
 
-export type Expression = IntegerLiteral | Bool | PrefixExpression | Identifier | InfixExpression;
+export type Expression = IntegerLiteral | Bool | PrefixExpression | Identifier | InfixExpression | IfExpression;
 
 export interface IntegerLiteral {
   _type: "IntegerLiteral";
@@ -133,16 +133,46 @@ export const createInfixExpression = ({ token, value, left, right }: InfixExpres
   toString: () => `(${left.toString()} ${value} ${right.toString()})`,
 });
 
-export interface IfStatement {
-  _type: "IfStatement";
+export interface IfExpression {
+  _type: "IfExpression";
+  token: Token;
   condition: Expression;
-  value: "if";
+  value: "noop";
   consequence: BlockStatement;
-  alternative: BlockStatement;
+  alternative?: BlockStatement;
 }
+
+interface IfExpressionRequirement {
+  token: Token;
+  condition: Expression;
+  consequence: BlockStatement;
+  alternative?: BlockStatement;
+}
+
+export const createIfExpression = ({ token, condition, consequence, alternative }: IfExpressionRequirement): IfExpression => ({
+  _type: "IfExpression",
+  token,
+  value: "noop",
+  condition,
+  consequence,
+  alternative,
+});
 
 export interface BlockStatement {
   _type: "BlockStatement";
+  value: "noop";
   token: Token;
   statements: Statement[];
 }
+
+interface BlockStatementRequirement {
+  token: Token;
+  statements: Statement[];
+}
+
+export const createBlockStatement = ({ token, statements }: BlockStatementRequirement): BlockStatement => ({
+  _type: "BlockStatement",
+  value: "noop",
+  token,
+  statements,
+});

@@ -3,7 +3,7 @@ import { parseStatement } from "./parseStatement";
 import { nextToken } from "./nextToken";
 import { initializeState } from "./_mock_/init";
 import { TOKEN_TYPE } from "../token";
-import { IfStatement } from "../ast";
+import { IfExpression } from "../ast";
 
 describe("[parseStatement]", () => {
   test("숫자 리터럴을 가지는 let문을 파싱한다.", () => {
@@ -152,14 +152,14 @@ describe("[parseStatement]", () => {
     const nextState = nextToken({ parserState: parserState, lexerState });
     const _nextState = nextToken(nextState);
 
-    const { statement } = parseStatement(_nextState) as { statement: IfStatement };
+    const { statement } = parseStatement(_nextState) as { statement: IfExpression };
 
-    expect(statement._type).toBe("IfStatement");
+    expect(statement._type).toBe("IfExpression");
 
     expect(statement.condition._type).toBe("InfixExpression");
 
     expect(statement.consequence._type).toBe("BlockStatement");
-    expect(statement.alternative._type).toBe("BlockStatement");
+    expect(statement.alternative).toBeUndefined();
   });
 
   test("expression을 파싱한다.", () => {

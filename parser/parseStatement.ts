@@ -1,20 +1,25 @@
 import { match } from "ts-pattern";
 import { Token, TOKEN_TYPE, TokenType, TokenTypeValue } from "../token";
 import {
+  BlockStatement,
   Bool,
+  createBlockStatement,
   createBoolExpression,
   createIdentifider,
+  createIfExpression,
   createInfixExpression,
   createIntegerExpression,
   createLetStatement,
   createPrefixExpression,
   Expression,
   Identifier,
+  IfExpression,
   InfixExpression,
   IntegerLiteral,
   Node,
   Operator,
   PrefixExpression,
+  Statement,
 } from "../ast";
 import { nextToken, State } from "./nextToken";
 import { LexerState } from "../lexer";
@@ -41,7 +46,7 @@ export const parseStatement = ({
   lexerState,
 }: State): {
   nextState: State;
-  statement: Node;
+  statement: Statement;
 } => {
   const result = match(parserState.curToken)
     .with({ type: TOKEN_TYPE.LET }, () => parseLetStatement(parserState, lexerState))
@@ -156,7 +161,57 @@ const parsePrefixExpression = (state: State): { expression: PrefixExpression; st
   };
 };
 
+const parseBlockStatement = (state: State): { statement: BlockStatement; state: State } => {
+  const statements = [];
+  let nextState = nextToken(state);
+
+  while (!curTokenIs(nextState.parserState.curToken, TOKEN_TYPE.RBRACE) && !curTokenIs(nextState.parserState.curToken, TOKEN_TYPE.EOF)) {
+    const { statement, nextState: _nextState } = parseStatement(nextState);
+    if (statement) statements.push(statement);
+    nextState = nextToken(_nextState);
+  }
+
+  return {
+    statement: createBlockStatement({
+      token: state.parserState.curToken,
+      statements,
+    }),
+    state: nextState,
+  };
+};
+
+const parseIfExpression = (state: State): { expression: IfExpression; state: State } => {
+  const nextState = expectPeek(state, TOKEN_TYPE.LPAREN);
+  const _nextState = nextToken(nextState);
+
+  const condition = parseExpression(_nextState, LOWEST);
+
+  const __nextState = expectPeek(condition.state, TOKEN_TYPE.RPAREN);
+  const ___nextState = expectPeek(__nextState, TOKEN_TYPE.LBRACE);
+
+  const { state: ____nextState, statement: consequence } = parseBlockStatement(___nextState);
+  console.log("🥸:: parseIfExpression", consequence);
+
+  if (peekTokenIs(____nextState.parserState, TOKEN_TYPE.ELSE)) {
+    // p.nextToken()
+    // if !p.expectPeek(token.LBRACE) {
+    // 	return nil
+    // }
+    // expression.Alternative = p.parseBlockStatement()
+  }
+
+  return {
+    expression: createIfExpression({
+      token: state.parserState.curToken,
+      condition: condition.expression,
+      consequence,
+    }),
+    state: ____nextState,
+  };
+};
+
 const prefixParseFns = {
+  [TOKEN_TYPE.IF]: parseIfExpression,
   [TOKEN_TYPE.IDENT]: parseIdentifier,
   [TOKEN_TYPE.INT]: parseIntegerLiteral,
   [TOKEN_TYPE.TRUE]: parseBoolean,

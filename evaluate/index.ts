@@ -34,7 +34,7 @@ const evalInfixExpression = (operator: Operator, left: LangObject, right: LangOb
   }
 };
 
-export const evaluate = (node: Node, context: Context) => {
+export const evaluate = (node: Node, context: Context): LangObject => {
   const result = match(node)
     .with({ _type: "LetStatement" }, (node) => evaluateLetStatement(node, context))
     .with({ _type: "Identifier" }, (node) => {
@@ -56,9 +56,23 @@ export const evaluate = (node: Node, context: Context) => {
 
       return evalInfixExpression(node.value, left, right);
     })
+    .with({ _type: "IfExpression" }, () => {
+      return evalIfExpression();
+    })
+    .with({ _type: "BlockStatement" }, () => {
+      return evalBlockStatement();
+    })
     .exhaustive();
 
   return result;
+};
+
+const evalIfExpression = (): LangObject => {
+  return null as unknown as LangObject;
+};
+
+const evalBlockStatement = (): LangObject => {
+  return null as unknown as LangObject;
 };
 
 const evaluateLetStatement = (node: LetStatement, context: Context): void => {

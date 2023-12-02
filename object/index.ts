@@ -41,7 +41,7 @@ export const createBoolObjectByValue = (value: boolean): BoolObject => ({
   value: value,
 });
 
-export const createPrefixObject = (node: PrefixExpression, right: LangObject) => {
+export const createPrefixObject = (node: PrefixExpression, right: LangObject): LangObject => {
   const result = match(node)
     .with({ value: "!" }, () => {
       return match(right.value as any)

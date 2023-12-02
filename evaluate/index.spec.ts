@@ -75,4 +75,25 @@ describe("eval", () => {
       expect(expected).toBe(result.value);
     }
   });
+
+  test("조건에 따른 구문을 실행할 수 있다.", () => {
+    const cases: [string, number | null][] = [
+      ["if (true) { 10 }", 10],
+      ["if (false) { 10 }", null],
+      ["if (1) { 10 }", 10],
+      ["if (1 < 2) { 10 }", 10],
+      ["if (1 > 2) { 10 }", null],
+      ["if (1 > 2) { 10 } else { 20 }", 20],
+      ["if (1 < 2) { 10 } else { 20 }", 10],
+    ];
+
+    for (const [code, expected] of cases) {
+      const state = initializeState(code);
+      const ast = parseProgram(state);
+      const rootContext = createContext();
+
+      const result = evaluate(ast.statements[0], rootContext);
+      expect(expected).toBe(result.value);
+    }
+  });
 });

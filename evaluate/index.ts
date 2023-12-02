@@ -1,5 +1,5 @@
 import { match } from "ts-pattern";
-import { LetStatement, Node, Identifier, Operator, createIntegerExpression } from "../ast";
+import { LetStatement, Node, Identifier, Operator, createIntegerExpression, IfExpression, BlockStatement } from "../ast";
 import { Context } from "../context";
 import {
   createIntegerObject,
@@ -9,6 +9,7 @@ import {
   createIntegerObjectByValue,
   IntegerObject,
   createBoolObjectByValue,
+  BoolObject,
 } from "../object";
 
 const evalIntegerInfixExpression = (operator: Operator, left: IntegerObject, right: IntegerObject) => {
@@ -56,23 +57,40 @@ export const evaluate = (node: Node, context: Context): LangObject => {
 
       return evalInfixExpression(node.value, left, right);
     })
-    .with({ _type: "IfExpression" }, () => {
-      return evalIfExpression();
+    .with({ _type: "IfExpression" }, (node) => {
+      return evalIfExpression(node, context);
     })
-    .with({ _type: "BlockStatement" }, () => {
-      return evalBlockStatement();
+    .with({ _type: "BlockStatement" }, (node) => {
+      return evalBlockStatement(node, context);
     })
     .exhaustive();
 
   return result;
 };
 
-const evalIfExpression = (): LangObject => {
-  return null as unknown as LangObject;
+const isTruthy = (condition: BoolObject) => {
+  if (!condition) return false;
+  return condition.value;
 };
 
-const evalBlockStatement = (): LangObject => {
-  return null as unknown as LangObject;
+const evalIfExpression = (node: IfExpression, context: Context): LangObject => {
+  const condition = evaluate(node.condition, context) as BoolObject;
+  if (isTruthy(condition)) {
+    return evaluate(node.consequence, context);
+  } else if (node?.alternative) {
+    return evaluate(node.alternative, context);
+  } else {
+    // 실행하지 않음
+    return null;
+  }
+};
+
+const evalBlockStatement = (node: BlockStatement, context: Context): LangObject => {
+  let result = null;
+  for (const statement of node.statements) {
+    result = evaluate(statement, context);
+  }
+  return result as LangObject;
 };
 
 const evaluateLetStatement = (node: LetStatement, context: Context): void => {

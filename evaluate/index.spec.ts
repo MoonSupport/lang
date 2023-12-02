@@ -93,7 +93,7 @@ describe("eval", () => {
       const rootContext = createContext();
 
       const result = evaluate(ast.statements[0], rootContext);
-      expect(expected).toBe(result.value);
+      expect(expected).toBe(result?.value || null);
     }
   });
 });

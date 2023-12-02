@@ -203,11 +203,6 @@ const parseIfExpression = (state: State): { expression: IfExpression; state: Sta
       }),
       state: _______nextState,
     };
-    // p.nextToken()
-    // if !p.expectPeek(token.LBRACE) {
-    // 	return nil
-    // }
-    // expression.Alternative = p.parseBlockStatement()
   }
 
   return {

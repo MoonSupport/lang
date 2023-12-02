@@ -181,6 +181,7 @@ describe("[parseStatement]", () => {
     expect(statement.alternative).not.toBeUndefined();
     expect(statement.alternative?._type).toBe("BlockStatement");
     expect(statement.alternative?.statements[0].value).toBe("y");
+    expect(statement.toString()).toBe("if(x < y) { x } else { y }");
   });
 
   test("expression을 파싱한다.", () => {

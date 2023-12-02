@@ -140,6 +140,8 @@ export interface IfExpression {
   value: "noop";
   consequence: BlockStatement;
   alternative?: BlockStatement;
+  tokenLiteral: () => string;
+  toString: () => string;
 }
 
 interface IfExpressionRequirement {
@@ -156,6 +158,8 @@ export const createIfExpression = ({ token, condition, consequence, alternative 
   condition,
   consequence,
   alternative,
+  tokenLiteral: () => token.literal,
+  toString: () => `if${condition.toString()} ${consequence.toString()} ${alternative ? `else ${alternative.toString()}` : ""}`,
 });
 
 export interface BlockStatement {
@@ -163,6 +167,8 @@ export interface BlockStatement {
   value: "noop";
   token: Token;
   statements: Statement[];
+  tokenLiteral: () => string;
+  toString: () => string;
 }
 
 interface BlockStatementRequirement {
@@ -175,4 +181,6 @@ export const createBlockStatement = ({ token, statements }: BlockStatementRequir
   value: "noop",
   token,
   statements,
+  tokenLiteral: () => token.literal,
+  toString: () => `{ ${statements.map((stmt) => stmt.toString()).join("\n")} }`,
 });

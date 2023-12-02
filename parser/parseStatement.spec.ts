@@ -3,7 +3,7 @@ import { parseStatement } from "./parseStatement";
 import { nextToken } from "./nextToken";
 import { initializeState } from "./_mock_/init";
 import { TOKEN_TYPE } from "../token";
-import { IfExpression } from "../ast";
+import { FunctionLiteral, IfExpression } from "../ast";
 
 describe("[parseStatement]", () => {
   test("숫자 리터럴을 가지는 let문을 파싱한다.", () => {
@@ -165,7 +165,6 @@ describe("[parseStatement]", () => {
 
   test("if else 문을 파싱한다", () => {
     const code = `if( x < y ){ x } else { y }`;
-
     const { parserState, lexerState } = initializeState(code);
     const nextState = nextToken({ parserState: parserState, lexerState });
     const _nextState = nextToken(nextState);
@@ -182,6 +181,18 @@ describe("[parseStatement]", () => {
     expect(statement.alternative?._type).toBe("BlockStatement");
     expect(statement.alternative?.statements[0].value).toBe("y");
     expect(statement.toString()).toBe("if(x < y) { x } else { y }");
+  });
+
+  test("함수를 파싱한다", () => {
+    const code = `fn(x, y) { x + y; }`;
+    const { parserState, lexerState } = initializeState(code);
+    const nextState = nextToken({ parserState: parserState, lexerState });
+    const _nextState = nextToken(nextState);
+
+    const { statement } = parseStatement(_nextState) as { statement: FunctionLiteral };
+
+    expect(statement._type).toBe("FunctionLiteral");
+    expect(statement.toString()).toBe("fn(x,y){ (x + y) }");
   });
 
   test("expression을 파싱한다.", () => {

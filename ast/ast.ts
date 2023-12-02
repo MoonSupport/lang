@@ -49,7 +49,7 @@ interface IntegerLiteralRequirement {
   value: number;
 }
 
-export type Expression = IntegerLiteral | Bool | PrefixExpression | Identifier | InfixExpression | IfExpression;
+export type Expression = IntegerLiteral | Bool | PrefixExpression | Identifier | InfixExpression | IfExpression | FunctionLiteral;
 
 export interface IntegerLiteral {
   _type: "IntegerLiteral";
@@ -183,4 +183,30 @@ export const createBlockStatement = ({ token, statements }: BlockStatementRequir
   statements,
   tokenLiteral: () => token.literal,
   toString: () => `{ ${statements.map((stmt) => stmt.toString()).join("\n")} }`,
+});
+
+export interface FunctionLiteral {
+  _type: "FunctionLiteral";
+  token: Token;
+  parameters: Identifier[];
+  body: BlockStatement;
+  value: "noop";
+  tokenLiteral: () => string;
+  toString: () => string;
+}
+
+interface FunctionLiteralRequirement {
+  token: Token;
+  parameters: Identifier[];
+  body: BlockStatement;
+}
+
+export const createFunctionLiteral = ({ token, parameters, body }: FunctionLiteralRequirement): FunctionLiteral => ({
+  _type: "FunctionLiteral",
+  token,
+  parameters,
+  body,
+  value: "noop",
+  tokenLiteral: () => token.literal,
+  toString: () => `${token.literal}(${parameters.map((p) => p.toString()).join(",")})${body.toString()}`,
 });

@@ -5,6 +5,7 @@ import {
   Bool,
   createBlockStatement,
   createBoolExpression,
+  createFunctionLiteral,
   createIdentifider,
   createIfExpression,
   createInfixExpression,
@@ -215,6 +216,41 @@ const parseIfExpression = (state: State): { expression: IfExpression; state: Sta
   };
 };
 
+const parseFunctionParameters = (state: State): { parameters: Identifier[]; state: State } => {
+  const parameters: Identifier[] = [];
+  if (peekTokenIs(state.parserState, TOKEN_TYPE.RPAREN)) {
+    const nextState = nextToken(state);
+    return { parameters, state: nextState };
+  }
+
+  let nextState = nextToken(state);
+
+  parameters.push(createIdentifider({ token: nextState.parserState.curToken, value: nextState.parserState.curToken.literal }));
+
+  while (peekTokenIs(nextState.parserState, TOKEN_TYPE.COMMA)) {
+    nextState = nextToken(nextToken(nextState));
+    parameters.push(createIdentifider({ token: nextState.parserState.curToken, value: nextState.parserState.curToken.literal }));
+  }
+
+  const _nextState = expectPeek(nextState, TOKEN_TYPE.RPAREN);
+  return { state: _nextState, parameters };
+};
+
+const parseFunctionLiteral = (state: State): { expression: Expression; state: State } => {
+  const nextState = expectPeek(state, TOKEN_TYPE.LPAREN);
+  const { parameters, state: _nextState } = parseFunctionParameters(nextState);
+  const __nextState = expectPeek(_nextState, TOKEN_TYPE.LBRACE);
+  const { state: ___nextState, statement: body } = parseBlockStatement(__nextState);
+  return {
+    expression: createFunctionLiteral({
+      token: state.parserState.curToken,
+      parameters,
+      body,
+    }),
+    state: ___nextState,
+  };
+};
+
 const prefixParseFns = {
   [TOKEN_TYPE.IF]: parseIfExpression,
   [TOKEN_TYPE.IDENT]: parseIdentifier,
@@ -224,6 +260,7 @@ const prefixParseFns = {
   [TOKEN_TYPE.BANG]: parsePrefixExpression,
   [TOKEN_TYPE.MINUS]: parsePrefixExpression,
   [TOKEN_TYPE.LPAREN]: parseGroupedExpression,
+  [TOKEN_TYPE.FUNCTION]: parseFunctionLiteral,
   // p.registerPrefix(token.LPAREN, p.parseGroupedExpression)
 } as Record<TokenTypeValue, (state: State) => { expression: Expression; state: State }>;
 

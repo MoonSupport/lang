@@ -159,7 +159,28 @@ describe("[parseStatement]", () => {
     expect(statement.condition._type).toBe("InfixExpression");
 
     expect(statement.consequence._type).toBe("BlockStatement");
+    expect(statement.consequence.statements[0].value).toBe("y");
     expect(statement.alternative).toBeUndefined();
+  });
+
+  test("if else 문을 파싱한다", () => {
+    const code = `if( x < y ){ x } else { y }`;
+
+    const { parserState, lexerState } = initializeState(code);
+    const nextState = nextToken({ parserState: parserState, lexerState });
+    const _nextState = nextToken(nextState);
+
+    const { statement } = parseStatement(_nextState) as { statement: IfExpression };
+
+    expect(statement._type).toBe("IfExpression");
+
+    expect(statement.condition._type).toBe("InfixExpression");
+
+    expect(statement.consequence._type).toBe("BlockStatement");
+    expect(statement.consequence.statements[0].value).toBe("x");
+    expect(statement.alternative).not.toBeUndefined();
+    expect(statement.alternative?._type).toBe("BlockStatement");
+    expect(statement.alternative?.statements[0].value).toBe("y");
   });
 
   test("expression을 파싱한다.", () => {

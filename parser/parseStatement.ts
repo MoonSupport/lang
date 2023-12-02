@@ -190,9 +190,19 @@ const parseIfExpression = (state: State): { expression: IfExpression; state: Sta
   const ___nextState = expectPeek(__nextState, TOKEN_TYPE.LBRACE);
 
   const { state: ____nextState, statement: consequence } = parseBlockStatement(___nextState);
-  console.log("🥸:: parseIfExpression", consequence);
-
   if (peekTokenIs(____nextState.parserState, TOKEN_TYPE.ELSE)) {
+    const _____nextState = nextToken(____nextState);
+    const ______nextState = expectPeek(_____nextState, TOKEN_TYPE.LBRACE);
+    const { state: _______nextState, statement: alternative } = parseBlockStatement(______nextState);
+    return {
+      expression: createIfExpression({
+        token: state.parserState.curToken,
+        condition: condition.expression,
+        consequence,
+        alternative,
+      }),
+      state: _______nextState,
+    };
     // p.nextToken()
     // if !p.expectPeek(token.LBRACE) {
     // 	return nil

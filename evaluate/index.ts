@@ -10,6 +10,7 @@ import {
   IntegerObject,
   createBoolObjectByValue,
   BoolObject,
+  createNullObject,
 } from "../object";
 
 const evalIntegerInfixExpression = (operator: Operator, left: IntegerObject, right: IntegerObject) => {
@@ -81,7 +82,7 @@ const evalIfExpression = (node: IfExpression, context: Context): LangObject => {
     return evaluate(node.alternative, context);
   } else {
     // 실행하지 않음
-    return null;
+    return createNullObject();
   }
 };
 

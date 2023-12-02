@@ -1,9 +1,15 @@
 import { match } from "ts-pattern";
 import { Bool, Expression, IntegerLiteral, Node, PrefixExpression, createBoolExpression } from "../ast";
 
-type ObjectType = "Integer" | "Bool";
+type ObjectType = "Integer" | "Bool" | "Null";
 
-export type LangObject = IntegerObject | BoolObject;
+export type LangObject = IntegerObject | BoolObject | NullObject;
+
+export interface NullObject {
+  type: ObjectType;
+  inspect: () => string;
+  value: null;
+}
 
 export interface IntegerObject {
   type: ObjectType;
@@ -39,6 +45,12 @@ export const createBoolObjectByValue = (value: boolean): BoolObject => ({
   type: "Bool",
   inspect: () => String(value),
   value: value,
+});
+
+export const createNullObject = (): NullObject => ({
+  type: "Null",
+  inspect: () => `null`,
+  value: null,
 });
 
 export const createPrefixObject = (node: PrefixExpression, right: LangObject): LangObject => {

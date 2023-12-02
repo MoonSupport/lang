@@ -51,12 +51,12 @@ describe("eval", () => {
     const rootContext = createContext();
 
     evaluate(ast.statements[0], rootContext);
-    const result = evaluate(ast.statements[1], rootContext);
+    const result = evaluate(ast.statements[1], rootContext) as IntegerObject;
     expect(expected).toBe(result.value);
   });
 
   test("우선 순위 연산자를 통해 더할 수 있다.", () => {
-    const cases: [string, number | boolean][] = [
+    const cases: [string, number | boolean | null][] = [
       [`let a = 1 + 2 * 3; a;`, 7],
       [`let a = (1 + 2) * 3; a;`, 9],
       [`let a = 2 > 1 * 3; a;`, false],
@@ -77,7 +77,7 @@ describe("eval", () => {
   });
 
   test("조건에 따른 구문을 실행할 수 있다.", () => {
-    const cases: [string, number | null][] = [
+    const cases: [string, boolean | number | null][] = [
       ["if (true) { 10 }", 10],
       ["if (false) { 10 }", null],
       ["if (1) { 10 }", 10],
@@ -93,7 +93,7 @@ describe("eval", () => {
       const rootContext = createContext();
 
       const result = evaluate(ast.statements[0], rootContext);
-      expect(expected).toBe(result?.value || null);
+      expect(expected).toBe(result.value);
     }
   });
 });

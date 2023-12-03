@@ -16,5 +16,6 @@ export const createContext = (type: ContextType = "Global"): Context => {
 export const createSubContext = (outer: Context, type: ContextType = "Fn") => {
   const context = createContext();
   context.outer = outer;
+  context.type = type;
   return context;
 };

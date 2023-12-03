@@ -5,6 +5,7 @@ import {
   Bool,
   createBlockStatement,
   createBoolExpression,
+  createCallExpression,
   createFunctionLiteral,
   createIdentifider,
   createIfExpression,
@@ -12,6 +13,7 @@ import {
   createIntegerExpression,
   createLetStatement,
   createPrefixExpression,
+  createReturnStatement,
   Expression,
   Identifier,
   IfExpression,
@@ -51,9 +53,33 @@ export const parseStatement = ({
 } => {
   const result = match(parserState.curToken)
     .with({ type: TOKEN_TYPE.LET }, () => parseLetStatement(parserState, lexerState))
+    .with({ type: TOKEN_TYPE.RETURN }, () => parseReturnStatement(parserState, lexerState))
     .otherwise(() => parseExpressionStatement({ parserState, lexerState }));
 
   return result;
+};
+
+const parseReturnStatement = (
+  parserState: ParserState,
+  lexerState: LexerState
+): {
+  nextState: State;
+  statement: Node;
+} => {
+  const nextState = nextToken({ parserState, lexerState });
+  const { expression, state: _nextState } = parseExpression(nextState, LOWEST);
+
+  if (peekTokenIs(_nextState.parserState, TOKEN_TYPE.SEMICOLON)) {
+    return {
+      statement: createReturnStatement({ token: parserState.curToken, returnValue: expression }),
+      nextState: nextToken(_nextState),
+    };
+  }
+
+  return {
+    statement: createReturnStatement({ token: parserState.curToken, returnValue: expression }),
+    nextState: _nextState,
+  };
 };
 
 const parseLetStatement = (
@@ -296,6 +322,43 @@ const parseInfixExpression = (
   };
 };
 
+const parseCallArguments = (state: State): { state: State; args: Expression[] } => {
+  const args: Expression[] = [];
+
+  if (peekTokenIs(state.parserState, TOKEN_TYPE.RPAREN)) {
+    return {
+      state: nextToken(state),
+      args,
+    };
+  }
+
+  const nextState = nextToken(state);
+  const { expression, state: _nextState } = parseExpression(nextState, LOWEST);
+  args.push(expression);
+
+  let loopNextState = _nextState;
+  while (peekTokenIs(loopNextState.parserState, TOKEN_TYPE.COMMA)) {
+    const { expression: _expression, state: _loopNextState } = parseExpression(nextToken(nextToken(loopNextState)), LOWEST);
+    loopNextState = _loopNextState;
+    args.push(_expression);
+  }
+
+  return { state: expectPeek(loopNextState, TOKEN_TYPE.RPAREN), args };
+};
+
+const parseCallExpression = (state: State, left: Expression): { expression: Expression; state: State } => {
+  const { state: _nextState, args } = parseCallArguments(state);
+
+  return {
+    expression: createCallExpression({
+      token: state.parserState.curToken,
+      fn: left,
+      args,
+    }),
+    state: _nextState,
+  };
+};
+
 const infixParseFns = {
   [TOKEN_TYPE.EQ]: parseInfixExpression,
   [TOKEN_TYPE.NOT_EQ]: parseInfixExpression,
@@ -305,7 +368,7 @@ const infixParseFns = {
   [TOKEN_TYPE.MINUS]: parseInfixExpression,
   [TOKEN_TYPE.SLASH]: parseInfixExpression,
   [TOKEN_TYPE.ASTERISK]: parseInfixExpression,
-  [TOKEN_TYPE.LPAREN]: parseInfixExpression,
+  [TOKEN_TYPE.LPAREN]: parseCallExpression,
 } as Record<TokenTypeValue, (state: State, left: Expression) => { expression: Expression; state: State }>;
 
 // 1 + 2 / 3 * 5 - 1

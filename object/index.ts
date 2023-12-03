@@ -1,9 +1,28 @@
 import { match } from "ts-pattern";
-import { Bool, Expression, IntegerLiteral, Node, PrefixExpression, createBoolExpression } from "../ast";
+import { BlockStatement, Bool, Expression, FunctionLiteral, Identifier, IntegerLiteral, Node, PrefixExpression, createBoolExpression } from "../ast";
+import { Context } from "../context";
 
-type ObjectType = "Integer" | "Bool" | "Null";
+type ObjectType = "Integer" | "Bool" | "Null" | "Fn";
 
-export type LangObject = IntegerObject | BoolObject | NullObject;
+export type LangObject = IntegerObject | BoolObject | NullObject | FnObject;
+
+export interface FnObject {
+  type: ObjectType;
+  inspect: () => string;
+  value: "noop";
+  parameters: Identifier[];
+  body: BlockStatement;
+  context: Context;
+}
+
+export const createFnObject = (node: FunctionLiteral, parameters: Identifier[], body: BlockStatement, context: Context): FnObject => ({
+  type: "Fn",
+  inspect: () => node.toString(),
+  parameters,
+  value: "noop",
+  body,
+  context,
+});
 
 export interface NullObject {
   type: ObjectType;

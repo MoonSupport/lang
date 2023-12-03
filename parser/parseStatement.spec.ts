@@ -3,7 +3,7 @@ import { parseStatement } from "./parseStatement";
 import { nextToken } from "./nextToken";
 import { initializeState } from "./_mock_/init";
 import { TOKEN_TYPE } from "../token";
-import { FunctionLiteral, IfExpression } from "../ast";
+import { CallExpression, FunctionLiteral, IfExpression } from "../ast";
 
 describe("[parseStatement]", () => {
   test("숫자 리터럴을 가지는 let문을 파싱한다.", () => {
@@ -184,15 +184,38 @@ describe("[parseStatement]", () => {
   });
 
   test("함수를 파싱한다", () => {
-    const code = `fn(x, y) { x + y; }`;
-    const { parserState, lexerState } = initializeState(code);
-    const nextState = nextToken({ parserState: parserState, lexerState });
-    const _nextState = nextToken(nextState);
+    const codes = [
+      [`fn(x, y) { x + y; }`, "fn(x,y){ (x + y) }"],
+      [`fn(x, y) { let z = x + y; return z + 1 }`, `fn(x,y){ let z = (x + y)\nreturn (z + 1); }`],
+    ];
+    for (const [code, expected] of codes) {
+      const { parserState, lexerState } = initializeState(code);
+      const nextState = nextToken({ parserState: parserState, lexerState });
+      const _nextState = nextToken(nextState);
 
-    const { statement } = parseStatement(_nextState) as { statement: FunctionLiteral };
+      const { statement } = parseStatement(_nextState) as { statement: FunctionLiteral };
+      expect(statement._type).toBe("FunctionLiteral");
+      expect(statement.toString()).toBe(expected);
+    }
+  });
 
-    expect(statement._type).toBe("FunctionLiteral");
-    expect(statement.toString()).toBe("fn(x,y){ (x + y) }");
+  test("함수 콜을 파싱한다.", () => {
+    const codes: [string, string, string[]][] = [
+      ["add()", "add", []],
+      ["add(1)", "add", ["1"]],
+      ["add(1, 2 * 3, 4 + 5)", "add", ["1", "(2 * 3)", "(4 + 5)"]],
+    ];
+
+    for (const [code, identifier, args] of codes) {
+      const { parserState, lexerState } = initializeState(code);
+      const nextState = nextToken({ parserState: parserState, lexerState });
+      const _nextState = nextToken(nextState);
+
+      const { statement } = parseStatement(_nextState) as { statement: CallExpression };
+      expect(statement._type).toBe("CallExpression");
+      expect(statement.fn.toString()).toBe(identifier);
+      expect(statement.args.map((arg) => arg.toString())).toStrictEqual(args);
+    }
   });
 
   test("expression을 파싱한다.", () => {

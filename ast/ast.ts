@@ -1,6 +1,6 @@
 import { Token } from "../token";
 
-export type Node = LetStatement | BlockStatement | Expression;
+export type Node = LetStatement | BlockStatement | ReturnStatement | Expression;
 export type Statement = Node;
 
 export interface LetStatement {
@@ -49,7 +49,7 @@ interface IntegerLiteralRequirement {
   value: number;
 }
 
-export type Expression = IntegerLiteral | Bool | PrefixExpression | Identifier | InfixExpression | IfExpression | FunctionLiteral;
+export type Expression = IntegerLiteral | Bool | PrefixExpression | Identifier | InfixExpression | IfExpression | FunctionLiteral | CallExpression;
 
 export interface IntegerLiteral {
   _type: "IntegerLiteral";
@@ -209,4 +209,53 @@ export const createFunctionLiteral = ({ token, parameters, body }: FunctionLiter
   value: "noop",
   tokenLiteral: () => token.literal,
   toString: () => `${token.literal}(${parameters.map((p) => p.toString()).join(",")})${body.toString()}`,
+});
+
+export interface CallExpression {
+  _type: "CallExpression";
+  token: Token;
+  value: "noop";
+  fn: Expression;
+  args: Expression[];
+  tokenLiteral: () => string;
+  toString: () => string;
+}
+
+interface CallExpressionRequirement {
+  token: Token;
+  fn: Expression;
+  args: Expression[];
+}
+
+export const createCallExpression = ({ token, fn, args }: CallExpressionRequirement): CallExpression => ({
+  _type: "CallExpression",
+  token,
+  value: "noop",
+  fn,
+  args,
+  tokenLiteral: () => token.literal,
+  toString: () => `${fn.toString()}(${args.map((arg) => arg.toString()).join(",")})`,
+});
+
+export interface ReturnStatement {
+  _type: "ReturnStatement";
+  token: Token;
+  returnValue: Expression;
+  value: "noop";
+  tokenLiteral: () => string;
+  toString: () => string;
+}
+
+interface ReturnStatementRequirement {
+  token: Token;
+  returnValue: Expression;
+}
+
+export const createReturnStatement = ({ token, returnValue }: ReturnStatementRequirement): ReturnStatement => ({
+  _type: "ReturnStatement",
+  token,
+  returnValue,
+  value: "noop",
+  tokenLiteral: () => token.literal,
+  toString: () => `${token.literal} ${returnValue.toString()};`,
 });

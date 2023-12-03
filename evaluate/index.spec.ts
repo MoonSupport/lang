@@ -103,7 +103,7 @@ describe("eval", () => {
       ["let double = fn(x) { return x * 2; }; double(5);", 10],
       ["let add = fn(x, y) { return x + y; }; add(5, 5);", 10],
       ["let add = fn(x, y) { return x + y; }; add(5 + 5, add(5, 5));", 20],
-      ["let add = fn(x, y) { if(true) { return 15 };  return x + y; }; add(5, 5);", 15],
+      ["let add = fn(x, y) { if(x + y == 10) { return 15 };  return x + y; }; add(5, 5);", 15],
     ];
 
     for (const [code, expected] of cases) {

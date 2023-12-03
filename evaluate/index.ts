@@ -145,6 +145,12 @@ const evalBlockStatement = (node: BlockStatement, context: Context): LangObject 
   for (const statement of node.statements) {
     result = evaluate(statement, context) as LangObject;
     if (context.type === "Fn") {
+      if (
+        statement._type === "IfExpression" &&
+        statement.consequence.statements[statement.consequence.statements.length - 1]._type === "ReturnStatement"
+      ) {
+        return result;
+      }
       if (statement._type === "ReturnStatement") {
         return result;
       } else {
